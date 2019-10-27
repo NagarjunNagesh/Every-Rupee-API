@@ -35,10 +35,10 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import in.co.everyrupee.constants.user.BankAccountConstants;
-import in.co.everyrupee.pojo.login.Profile;
 import in.co.everyrupee.pojo.user.AccountType;
 import in.co.everyrupee.pojo.user.BankAccount;
 import in.co.everyrupee.repository.user.BankAccountRepository;
+import in.co.everyrupee.service.login.ProfileService;
 
 /**
  * Bank Account Controller Test (Cache, Controller. Service)
@@ -61,6 +61,9 @@ public class BankAccountIntegrationTest {
 
 	@MockBean
 	private BankAccountRepository bankAccountRepository;
+
+	@MockBean
+	private ProfileService profileService;
 
 	@Autowired
 	CacheManager cacheManager;
@@ -97,6 +100,9 @@ public class BankAccountIntegrationTest {
 		// Testing the Cache Layer
 		when(getBankAccountRepository().findByFinancialPortfolioId(FINANCIAL_PORTFOLIO_ID))
 				.thenReturn(getAllBankAccounts());
+
+		// Mock Profile service
+		when(getProfileService().validateUser(Mockito.any())).thenReturn(FINANCIAL_PORTFOLIO_ID);
 
 		// Mock the save to return some value
 		when(bankAccountRepository.save(Mockito.any(BankAccount.class))).thenReturn(bankAccount2);
@@ -170,10 +176,6 @@ public class BankAccountIntegrationTest {
 	@WithMockUser(value = "spring")
 	public void addAccount() throws Exception {
 
-		// Find User By Profile
-		Profile profile = new Profile();
-		profile.setId(35454647);
-
 		RequestBuilder request = MockMvcRequestBuilders.post("/api/bankaccount/add").param("id", "3232")
 				.param("selectedAccount", "false").param("linked", "false").param("userId", "3233")
 				.param("bankAccountName", "HDFC").param("accountBalance", "5655").param("accountType", "CASH")
@@ -223,6 +225,10 @@ public class BankAccountIntegrationTest {
 
 	private CacheManager getCacheManager() {
 		return cacheManager;
+	}
+
+	private ProfileService getProfileService() {
+		return profileService;
 	}
 
 }
