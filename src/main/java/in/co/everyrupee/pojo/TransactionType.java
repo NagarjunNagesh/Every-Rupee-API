@@ -1,12 +1,16 @@
 package in.co.everyrupee.pojo;
 
 public enum TransactionType {
-    INCOME("Income"), EXPENSE("Expense");
+	INCOME("Income"), EXPENSE("Expense");
 
-    private String type;
+	private String type;
 
-    private TransactionType(String type) {
-	this.type = type;
-    }
+	private TransactionType(String type) {
+		this.type = type;
+	}
+
+	public String getType() {
+		return type;
+	}
 
 }

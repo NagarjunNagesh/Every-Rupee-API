@@ -41,7 +41,6 @@ import in.co.everyrupee.pojo.TransactionType;
 import in.co.everyrupee.pojo.income.Category;
 import in.co.everyrupee.pojo.income.UserTransaction;
 import in.co.everyrupee.repository.income.UserTransactionsRepository;
-import in.co.everyrupee.security.core.userdetails.MyUser;
 import in.co.everyrupee.utils.ERStringUtils;
 import in.co.everyrupee.utils.GenericUtils;
 
@@ -83,8 +82,7 @@ public class UserTransactionService implements IUserTransactionService {
 		userTransactions = userTransactionsRepository.findByFinancialPortfolioIdAndDate(pFinancialPortfolioId, date);
 
 		if (CollectionUtils.isEmpty(userTransactions)) {
-			MyUser user = (MyUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-			LOGGER.warn("user transactions data is empty for user ", user.getUsername());
+			LOGGER.warn("user transactions data is empty for user ");
 			return userTransactions;
 		}
 
@@ -229,8 +227,7 @@ public class UserTransactionService implements IUserTransactionService {
 				.findByFinancialPortfolioIdAndDate(financialPortfolioId, date);
 
 		if (CollectionUtils.isEmpty(userTransactions)) {
-			MyUser user = (MyUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-			LOGGER.warn("user transactions data is empty for user ", user.getUsername());
+			LOGGER.warn("user transactions data is empty for user ");
 			return categoryAndTotalAmountMap;
 		}
 

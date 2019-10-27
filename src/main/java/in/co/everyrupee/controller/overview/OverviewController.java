@@ -29,52 +29,52 @@ import in.co.everyrupee.service.login.ProfileService;
 @Validated
 public class OverviewController {
 
-    @Autowired
-    private IUserTransactionService userTransactionService;
+	@Autowired
+	private IUserTransactionService userTransactionService;
 
-    @Autowired
-    private ProfileService profileService;
+	@Autowired
+	private ProfileService profileService;
 
-    /**
-     * Get user transactions sorted by creation date - DESC
-     * 
-     * @param pFinancialPortfolioId
-     * @param userPrincipal
-     * @return
-     */
-    @RequestMapping(value = "/recentTransactions", method = RequestMethod.GET)
-    public Object getUserTransactionByFinancialPortfolioId(Principal userPrincipal,
-	    @RequestParam(DashboardConstants.Overview.DATE_MEANT_FOR) @Size(min = 0, max = 10) String dateMeantFor) {
+	/**
+	 * Get user transactions sorted by creation date - DESC
+	 * 
+	 * @param pFinancialPortfolioId
+	 * @param userPrincipal
+	 * @return
+	 */
+	@RequestMapping(value = "/recentTransactions", method = RequestMethod.GET)
+	public Object getUserTransactionByFinancialPortfolioId(Principal userPrincipal,
+			@RequestParam(DashboardConstants.Overview.DATE_MEANT_FOR) @Size(min = 0, max = 10) String dateMeantFor) {
 
-	Integer pFinancialPortfolioId = getProfileService().validateUser(userPrincipal);
+		Integer pFinancialPortfolioId = getProfileService().validateUser(userPrincipal);
 
-	return getUserTransactionService().fetchUserTransactionByCreationDate(pFinancialPortfolioId, dateMeantFor);
-    }
+		return getUserTransactionService().fetchUserTransactionByCreationDate(pFinancialPortfolioId, dateMeantFor);
+	}
 
-    /**
-     * Fetch the lifetime average income / average expense /
-     * 
-     * @param userPrincipal
-     * @param type
-     * @param fetchAverage
-     * @return
-     */
-    @RequestMapping(value = "/lifetime", method = RequestMethod.GET)
-    public Object getLifetimeIncomeByFinancialPortfolioId(Principal userPrincipal,
-	    @Valid @RequestParam(DashboardConstants.Overview.TYPE_PARAM) TransactionType type,
-	    @RequestParam(DashboardConstants.Overview.AVERAGE_PARAM) boolean fetchAverage) {
+	/**
+	 * Fetch the lifetime average income / average expense /
+	 * 
+	 * @param userPrincipal
+	 * @param type
+	 * @param fetchAverage
+	 * @return
+	 */
+	@RequestMapping(value = "/lifetime", method = RequestMethod.GET)
+	public Object getLifetimeIncomeByFinancialPortfolioId(Principal userPrincipal,
+			@Valid @RequestParam(DashboardConstants.Overview.TYPE_PARAM) TransactionType type,
+			@RequestParam(DashboardConstants.Overview.AVERAGE_PARAM) boolean fetchAverage) {
 
-	Integer pFinancialPortfolioId = getProfileService().validateUser(userPrincipal);
+		Integer pFinancialPortfolioId = getProfileService().validateUser(userPrincipal);
 
-	return getUserTransactionService().fetchLifetimeCalculations(type, fetchAverage, pFinancialPortfolioId);
-    }
+		return getUserTransactionService().fetchLifetimeCalculations(type, fetchAverage, pFinancialPortfolioId);
+	}
 
-    private ProfileService getProfileService() {
-	return profileService;
-    }
+	private ProfileService getProfileService() {
+		return profileService;
+	}
 
-    private IUserTransactionService getUserTransactionService() {
-	return userTransactionService;
-    }
+	private IUserTransactionService getUserTransactionService() {
+		return userTransactionService;
+	}
 
 }
