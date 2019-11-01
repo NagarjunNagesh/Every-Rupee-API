@@ -12,10 +12,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import in.co.everyrupee.constants.GenericConstants;
 import in.co.everyrupee.constants.income.DashboardConstants;
 import in.co.everyrupee.pojo.TransactionType;
 import in.co.everyrupee.service.income.IUserTransactionService;
-import in.co.everyrupee.service.login.ProfileService;
 
 /**
  *
@@ -32,9 +32,6 @@ public class OverviewController {
 	@Autowired
 	private IUserTransactionService userTransactionService;
 
-	@Autowired
-	private ProfileService profileService;
-
 	/**
 	 * Get user transactions sorted by creation date - DESC
 	 * 
@@ -44,11 +41,11 @@ public class OverviewController {
 	 */
 	@RequestMapping(value = "/recentTransactions", method = RequestMethod.GET)
 	public Object getUserTransactionByFinancialPortfolioId(Principal userPrincipal,
-			@RequestParam(DashboardConstants.Overview.DATE_MEANT_FOR) @Size(min = 0, max = 10) String dateMeantFor) {
+			@RequestParam(DashboardConstants.Overview.DATE_MEANT_FOR) @Size(min = 0, max = 10) String dateMeantFor,
+			@RequestParam(DashboardConstants.Overview.FINANCIAL_PORTFOLIO_ID) @Size(min = 0, max = GenericConstants.MAX_ALLOWED_LENGTH_FINANCIAL_PORTFOLIO) String pFinancialPortfolioId) {
 
-		Integer pFinancialPortfolioId = getProfileService().validateUser(userPrincipal);
-
-		return getUserTransactionService().fetchUserTransactionByCreationDate(pFinancialPortfolioId, dateMeantFor);
+		return getUserTransactionService().fetchUserTransactionByCreationDate(Integer.parseInt(pFinancialPortfolioId),
+				dateMeantFor);
 	}
 
 	/**
@@ -62,15 +59,11 @@ public class OverviewController {
 	@RequestMapping(value = "/lifetime", method = RequestMethod.GET)
 	public Object getLifetimeIncomeByFinancialPortfolioId(Principal userPrincipal,
 			@Valid @RequestParam(DashboardConstants.Overview.TYPE_PARAM) TransactionType type,
-			@RequestParam(DashboardConstants.Overview.AVERAGE_PARAM) boolean fetchAverage) {
+			@RequestParam(DashboardConstants.Overview.AVERAGE_PARAM) boolean fetchAverage,
+			@RequestParam(DashboardConstants.Overview.FINANCIAL_PORTFOLIO_ID) @Size(min = 0, max = GenericConstants.MAX_ALLOWED_LENGTH_FINANCIAL_PORTFOLIO) String pFinancialPortfolioId) {
 
-		Integer pFinancialPortfolioId = getProfileService().validateUser(userPrincipal);
-
-		return getUserTransactionService().fetchLifetimeCalculations(type, fetchAverage, pFinancialPortfolioId);
-	}
-
-	private ProfileService getProfileService() {
-		return profileService;
+		return getUserTransactionService().fetchLifetimeCalculations(type, fetchAverage,
+				Integer.parseInt(pFinancialPortfolioId));
 	}
 
 	private IUserTransactionService getUserTransactionService() {

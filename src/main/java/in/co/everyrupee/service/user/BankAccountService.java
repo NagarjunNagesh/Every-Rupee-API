@@ -41,7 +41,7 @@ public class BankAccountService implements IBankAccountService {
 
 	@Override
 	@CacheEvict(key = "#pFinancialPortfolioId")
-	public BankAccount addNewBankAccount(Integer pFinancialPortfolioId, MultiValueMap<String, String> formData) {
+	public BankAccount addNewBankAccount(MultiValueMap<String, String> formData) {
 
 		if (ERStringUtils.isBlank(formData.getFirst(BankAccountConstants.LINKED_ACCOUNT))) {
 			throw new InvalidAttributeValueException("addNewBankAccount", BankAccountConstants.LINKED_ACCOUNT, null);
@@ -49,7 +49,8 @@ public class BankAccountService implements IBankAccountService {
 
 		BankAccount newAccount = new BankAccount();
 		newAccount.setLinked(Boolean.parseBoolean(formData.getFirst(BankAccountConstants.LINKED_ACCOUNT_PARAM)));
-		newAccount.setFinancialPortfolioId(pFinancialPortfolioId);
+		newAccount.setFinancialPortfolioId(
+				Integer.parseInt(formData.getFirst(BankAccountConstants.FINANCIAL_PORTFOLIO_ID_PARAM)));
 		// TODO
 		// newAccount.setUserId(profileService.findUserByEmail(user.getUsername()).get().getId());
 		newAccount.setBankAccountName(formData.getFirst(BankAccountConstants.BANK_ACCOUNT_NAME_PARAM));
@@ -102,7 +103,7 @@ public class BankAccountService implements IBankAccountService {
 	}
 
 	@Override
-	public void selectAccount(Integer pFinancialPortfolioId, MultiValueMap<String, String> formData) {
+	public void selectAccount(MultiValueMap<String, String> formData) {
 		String bankAccountId = formData.getFirst(BankAccountConstants.BANK_ACCOUNT_ID);
 		String selectedAccount = formData.getFirst(BankAccountConstants.SELECTED_ACCOUNT_PARAM);
 
