@@ -34,11 +34,11 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import in.co.everyrupee.constants.income.DashboardConstants;
 import in.co.everyrupee.constants.user.BankAccountConstants;
 import in.co.everyrupee.pojo.user.AccountType;
 import in.co.everyrupee.pojo.user.BankAccount;
 import in.co.everyrupee.repository.user.BankAccountRepository;
-import in.co.everyrupee.service.login.ProfileService;
 
 /**
  * Bank Account Controller Test (Cache, Controller. Service)
@@ -61,9 +61,6 @@ public class BankAccountIntegrationTest {
 
 	@MockBean
 	private BankAccountRepository bankAccountRepository;
-
-	@MockBean
-	private ProfileService profileService;
 
 	@Autowired
 	CacheManager cacheManager;
@@ -101,9 +98,6 @@ public class BankAccountIntegrationTest {
 		when(getBankAccountRepository().findByFinancialPortfolioId(FINANCIAL_PORTFOLIO_ID))
 				.thenReturn(getAllBankAccounts());
 
-		// Mock Profile service
-		when(getProfileService().validateUser(Mockito.any())).thenReturn(FINANCIAL_PORTFOLIO_ID);
-
 		// Mock the save to return some value
 		when(bankAccountRepository.save(Mockito.any(BankAccount.class))).thenReturn(bankAccount2);
 
@@ -119,14 +113,17 @@ public class BankAccountIntegrationTest {
 	@Test
 	@WithMockUser(value = "spring")
 	public void fetchAllBankAccounts() throws Exception {
-		getMvc().perform(get("/api/bankaccount/").contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
-				.andExpect(jsonPath("$[0]").isNotEmpty())
+		getMvc().perform(get("/api/bankaccount/").contentType(MediaType.APPLICATION_JSON)
+				.param(DashboardConstants.Overview.FINANCIAL_PORTFOLIO_ID, FINANCIAL_PORTFOLIO_ID.toString()))
+				.andExpect(status().isOk()).andExpect(jsonPath("$[0]").isNotEmpty())
 //		.andDo(MockMvcResultHandlers.print())
 				.andExpect(jsonPath("$[0].accountBalance", is(100.0)));
 
 		// Testing the Cache Layer
-		getMvc().perform(get("/api/bankaccount/").contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
-				.andExpect(jsonPath("$[0]").isNotEmpty()).andExpect(jsonPath("$[0].accountBalance", is(100.0)));
+		getMvc().perform(get("/api/bankaccount/").contentType(MediaType.APPLICATION_JSON)
+				.param(DashboardConstants.Overview.FINANCIAL_PORTFOLIO_ID, FINANCIAL_PORTFOLIO_ID.toString()))
+				.andExpect(status().isOk()).andExpect(jsonPath("$[0]").isNotEmpty())
+				.andExpect(jsonPath("$[0].accountBalance", is(100.0)));
 
 		// Making Sure the Cache was used
 		verify(getBankAccountRepository(), times(1)).findByFinancialPortfolioId(FINANCIAL_PORTFOLIO_ID);
@@ -144,7 +141,8 @@ public class BankAccountIntegrationTest {
 	@Test
 	@WithMockUser(value = "spring")
 	public void previewBankAccounts() throws Exception {
-		getMvc().perform(get("/api/bankaccount/preview").contentType(MediaType.APPLICATION_JSON))
+		getMvc().perform(get("/api/bankaccount/preview").contentType(MediaType.APPLICATION_JSON)
+				.param(DashboardConstants.Overview.FINANCIAL_PORTFOLIO_ID, FINANCIAL_PORTFOLIO_ID.toString()))
 				.andExpect(status().isOk()).andExpect(jsonPath("$[0]").isNotEmpty())
 				.andExpect(jsonPath("$[0].accountBalance", is(324.0)));
 
@@ -160,8 +158,9 @@ public class BankAccountIntegrationTest {
 	public void selectAccount() throws Exception {
 
 		RequestBuilder request = MockMvcRequestBuilders.post("/api/bankaccount/select").param("id", "3232")
-				.param("selectedAccount", "false").accept(MediaType.APPLICATION_JSON)
-				.contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE);
+				.param("selectedAccount", "false")
+				.param(DashboardConstants.Overview.FINANCIAL_PORTFOLIO_ID, FINANCIAL_PORTFOLIO_ID.toString())
+				.accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE);
 
 		getMvc().perform(request).andExpect(status().isOk());
 
@@ -178,8 +177,10 @@ public class BankAccountIntegrationTest {
 
 		RequestBuilder request = MockMvcRequestBuilders.post("/api/bankaccount/add").param("id", "3232")
 				.param("selectedAccount", "false").param("linked", "false").param("userId", "3233")
-				.param("bankAccountName", "HDFC").param("accountBalance", "5655").param("accountType", "CASH")
-				.accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE);
+				.param("bankAccountName", "HDFC")
+				.param(DashboardConstants.Overview.FINANCIAL_PORTFOLIO_ID, FINANCIAL_PORTFOLIO_ID.toString())
+				.param("accountBalance", "5655").param("accountType", "CASH").accept(MediaType.APPLICATION_JSON)
+				.contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE);
 
 		getMvc().perform(request).andExpect(status().isOk()).andExpect(jsonPath("$").isNotEmpty())
 				.andExpect(jsonPath("$.accountBalance", is(324.0)));
@@ -194,7 +195,8 @@ public class BankAccountIntegrationTest {
 	@Test
 	@WithMockUser(value = "spring")
 	public void categorizeBankAccounts() throws Exception {
-		getMvc().perform(get("/api/bankaccount/categorize").contentType(MediaType.APPLICATION_JSON))
+		getMvc().perform(get("/api/bankaccount/categorize").contentType(MediaType.APPLICATION_JSON)
+				.param(DashboardConstants.Overview.FINANCIAL_PORTFOLIO_ID, FINANCIAL_PORTFOLIO_ID.toString()))
 				.andExpect(status().isOk()).andExpect(jsonPath("$").isNotEmpty());
 
 	}
@@ -225,10 +227,6 @@ public class BankAccountIntegrationTest {
 
 	private CacheManager getCacheManager() {
 		return cacheManager;
-	}
-
-	private ProfileService getProfileService() {
-		return profileService;
 	}
 
 }
