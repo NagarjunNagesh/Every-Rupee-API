@@ -21,17 +21,14 @@ import in.co.everyrupee.service.income.ICategoryService;
 @RequestMapping("/api/category")
 public class CategoryController {
 
-    @Autowired
-    private ICategoryService categoryService;
+	@Autowired
+	private ICategoryService categoryService;
 
-    // Get a Single User Transaction
-    @RequestMapping(value = "/", method = RequestMethod.GET)
-    public List<Category> getCategoryById(Principal userPrincipal) {
-	if (userPrincipal == null) {
-	    throw new SecurityException();
+	// Get a Single User Transaction
+	@RequestMapping(value = "/", method = RequestMethod.GET)
+	public List<Category> getCategoryById(Principal userPrincipal) {
+
+		return categoryService.fetchCategories();
 	}
-
-	return categoryService.fetchCategories();
-    }
 
 }
