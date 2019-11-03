@@ -20,5 +20,5 @@ public class BankAccountConstants {
 	public static final String SELECTED_ACCOUNT_PARAM = "selectedAccount";
 	public static final String NUMBER_OF_TIMES_SELECTED = "number_of_times_selected";
 	public static final String FINANCIAL_PORTFOLIO_ID_PARAM = "financialPortfolioId";
-
+	public static final String USER_ID_PARAM = "userId";
 }

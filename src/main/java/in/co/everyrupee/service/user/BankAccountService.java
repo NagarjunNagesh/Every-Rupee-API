@@ -40,7 +40,7 @@ public class BankAccountService implements IBankAccountService {
 	}
 
 	@Override
-	@CacheEvict(key = "#pFinancialPortfolioId")
+	@CacheEvict(key = "#formData.getFirst(\"financialPortfolioId\")")
 	public BankAccount addNewBankAccount(MultiValueMap<String, String> formData) {
 
 		if (ERStringUtils.isBlank(formData.getFirst(BankAccountConstants.LINKED_ACCOUNT))) {
@@ -51,8 +51,7 @@ public class BankAccountService implements IBankAccountService {
 		newAccount.setLinked(Boolean.parseBoolean(formData.getFirst(BankAccountConstants.LINKED_ACCOUNT_PARAM)));
 		newAccount.setFinancialPortfolioId(
 				Integer.parseInt(formData.getFirst(BankAccountConstants.FINANCIAL_PORTFOLIO_ID_PARAM)));
-		// TODO
-		// newAccount.setUserId(profileService.findUserByEmail(user.getUsername()).get().getId());
+		newAccount.setUserId(Integer.parseInt(formData.getFirst(BankAccountConstants.USER_ID_PARAM)));
 		newAccount.setBankAccountName(formData.getFirst(BankAccountConstants.BANK_ACCOUNT_NAME_PARAM));
 		newAccount.setAccountBalance(Double.parseDouble(formData.getFirst(BankAccountConstants.ACCOUNT_BALANCE_PARAM)));
 		// Replace all space in the text to without space
