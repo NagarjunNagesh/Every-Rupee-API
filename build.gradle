@@ -19,8 +19,8 @@ group = 'com.blitzbudget'
 version = '0.0.1-SNAPSHOT'
 
 bootJar {
-    baseName = 'transactions'
-    version =  '0.0.1'
+    baseName = 'bb-core'
+    version =  '0.0.2'
 }
 
 // Default Spring Profile
