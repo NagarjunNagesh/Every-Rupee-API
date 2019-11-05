@@ -41,11 +41,7 @@ public class UserBudgetController {
 	// Get All User Budgets
 	@RequestMapping(value = "/{financialPortfolioId}", method = RequestMethod.GET)
 	public List<UserBudget> getUserBudgetByFinancialPortfolioId(@PathVariable String financialPortfolioId,
-			Principal userPrincipal,
 			@RequestParam(DashboardConstants.Budget.DATE_MEANT_FOR) @Size(min = 0, max = 10) String dateMeantFor) {
-		if (userPrincipal == null) {
-			throw new SecurityException();
-		}
 
 		return getUserBudgetService().fetchAllUserBudget(financialPortfolioId, dateMeantFor);
 	}
