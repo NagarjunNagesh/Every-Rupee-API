@@ -15,7 +15,7 @@ public interface IBankAccountService {
 	 * @param financialPortfolioId
 	 * @return
 	 */
-	public List<BankAccount> getAllBankAccounts(Integer financialPortfolioId);
+	public List<BankAccount> getAllBankAccounts(String financialPortfolioId);
 
 	/**
 	 * Add a new bank account
@@ -31,7 +31,7 @@ public interface IBankAccountService {
 	 * @param financialPortfolioId
 	 * @return
 	 */
-	public List<BankAccount> previewBankAccounts(Integer financialPortfolioId);
+	public List<BankAccount> previewBankAccounts(String financialPortfolioId);
 
 	/**
 	 * Select Account
@@ -48,5 +48,5 @@ public interface IBankAccountService {
 	 * @param pFinancialPortfolioId
 	 * @return
 	 */
-	public Map<String, Set<BankAccount>> categorizeBankAccount(Integer pFinancialPortfolioId);
+	public Map<String, Set<BankAccount>> categorizeBankAccount(String pFinancialPortfolioId);
 }

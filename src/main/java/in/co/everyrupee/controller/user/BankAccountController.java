@@ -45,7 +45,7 @@ public class BankAccountController {
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public List<BankAccount> getAllBankAccounts(
 			@RequestParam(DashboardConstants.Overview.FINANCIAL_PORTFOLIO_ID) @Size(min = 0, max = GenericConstants.MAX_ALLOWED_LENGTH_FINANCIAL_PORTFOLIO) String pFinancialPortfolioId) {
-		return getBankAccountService().getAllBankAccounts(Integer.parseInt(pFinancialPortfolioId));
+		return getBankAccountService().getAllBankAccounts(pFinancialPortfolioId);
 	}
 
 	/**
@@ -67,7 +67,7 @@ public class BankAccountController {
 	@RequestMapping(value = "/preview", method = RequestMethod.GET)
 	public List<BankAccount> previewBankAccounts(
 			@RequestParam(DashboardConstants.Overview.FINANCIAL_PORTFOLIO_ID) @Size(min = 0, max = GenericConstants.MAX_ALLOWED_LENGTH_FINANCIAL_PORTFOLIO) String pFinancialPortfolioId) {
-		return getBankAccountService().previewBankAccounts(Integer.parseInt(pFinancialPortfolioId));
+		return getBankAccountService().previewBankAccounts(pFinancialPortfolioId);
 	}
 
 	/**
@@ -92,7 +92,7 @@ public class BankAccountController {
 	@RequestMapping(value = "/categorize", method = RequestMethod.GET)
 	public Map<String, Set<BankAccount>> categorizeBankAccount(
 			@RequestParam(DashboardConstants.Overview.FINANCIAL_PORTFOLIO_ID) @Size(min = 0, max = GenericConstants.MAX_ALLOWED_LENGTH_FINANCIAL_PORTFOLIO) String pFinancialPortfolioId) {
-		return getBankAccountService().categorizeBankAccount(Integer.parseInt(pFinancialPortfolioId));
+		return getBankAccountService().categorizeBankAccount(pFinancialPortfolioId);
 	}
 
 	public IBankAccountService getBankAccountService() {

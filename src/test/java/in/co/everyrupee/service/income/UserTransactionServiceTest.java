@@ -43,203 +43,201 @@ import in.co.everyrupee.utils.ERStringUtils;
 @WithMockUser
 public class UserTransactionServiceTest {
 
-    @Autowired
-    private UserTransactionService userTransactionService;
+	@Autowired
+	private UserTransactionService userTransactionService;
 
-    @MockBean
-    private UserTransactionsRepository userTransactionsRepository;
+	@MockBean
+	private UserTransactionsRepository userTransactionsRepository;
 
-    @MockBean
-    private CategoryService categoryService;
+	@MockBean
+	private CategoryService categoryService;
 
-    Logger logger = LoggerFactory.getLogger(this.getClass());
+	Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private Date dateMeantFor;
+	private Date dateMeantFor;
 
-    private List<Integer> categoryIdList;
+	private List<Integer> categoryIdList;
 
-    private static final String FINANCIAL_PORTFOLIO_ID = "193000000";
+	private static final String FINANCIAL_PORTFOLIO_ID = "193000000";
 
-    private static final Integer FINANCIAL_PORTFOLIO_ID_INT = 193000000;
+	private static final String DATE_MEANT_FOR = "01062019";
 
-    private static final String DATE_MEANT_FOR = "01062019";
+	@TestConfiguration
+	static class UserTransactionServiceImplTestContextConfiguration {
 
-    @TestConfiguration
-    static class UserTransactionServiceImplTestContextConfiguration {
-
-	@Bean
-	public UserTransactionService userTransactionService() {
-	    return new UserTransactionService();
-	}
-    }
-
-    @Before
-    public void setUp() {
-
-	UserTransaction userTransaction = new UserTransaction();
-	userTransaction.setFinancialPortfolioId(FINANCIAL_PORTFOLIO_ID);
-	userTransaction.setCategoryId(3);
-	userTransaction.setAmount(300);
-	DateFormat format = new SimpleDateFormat(DashboardConstants.DATE_FORMAT, Locale.ENGLISH);
-	try {
-	    setDateMeantFor(format.parse(DATE_MEANT_FOR));
-	    userTransaction.setDateMeantFor(getDateMeantFor());
-	    List<UserTransaction> userTransactionList = new ArrayList<UserTransaction>();
-	    userTransactionList.add(userTransaction);
-
-	    // Fetch all Transaction
-	    when(getUserTransactionsRepository().findByFinancialPortfolioIdAndDate(FINANCIAL_PORTFOLIO_ID,
-		    getDateMeantFor())).thenReturn(userTransactionList);
-
-	    UserTransaction userTransactionSaved = new UserTransaction();
-	    userTransactionSaved.setFinancialPortfolioId(FINANCIAL_PORTFOLIO_ID);
-	    userTransactionSaved.setCategoryId(3);
-	    userTransactionSaved.setAmount(600);
-	    Mockito.when(getUserTransactionsRepository().save(Mockito.any())).thenReturn(userTransactionSaved);
-
-	    Optional<UserTransaction> userBudgetReturnValue = userTransactionList.stream().findFirst();
-	    when(userTransactionsRepository.findById(3)).thenReturn(userBudgetReturnValue);
-
-	} catch (ParseException e) {
-	    logger.error(e + " Unable to add date to the user Transaction");
+		@Bean
+		public UserTransactionService userTransactionService() {
+			return new UserTransactionService();
+		}
 	}
 
-	// Set Category Id List
-	setCategoryIdList(new ArrayList<Integer>());
-	getCategoryIdList().add(3);
-	getCategoryIdList().add(4);
-	getCategoryIdList().add(5);
-	getCategoryIdList().add(6);
+	@Before
+	public void setUp() {
 
-    }
+		UserTransaction userTransaction = new UserTransaction();
+		userTransaction.setFinancialPortfolioId(FINANCIAL_PORTFOLIO_ID);
+		userTransaction.setCategoryId(3);
+		userTransaction.setAmount(300);
+		DateFormat format = new SimpleDateFormat(DashboardConstants.DATE_FORMAT, Locale.ENGLISH);
+		try {
+			setDateMeantFor(format.parse(DATE_MEANT_FOR));
+			userTransaction.setDateMeantFor(getDateMeantFor());
+			List<UserTransaction> userTransactionList = new ArrayList<UserTransaction>();
+			userTransactionList.add(userTransaction);
 
-    /**
-     * TEST: Fetch user transactions
-     */
-    @SuppressWarnings("unchecked")
-    @Test
-    public void fetchUserTransaction() {
+			// Fetch all Transaction
+			when(getUserTransactionsRepository().findByFinancialPortfolioIdAndDate(FINANCIAL_PORTFOLIO_ID,
+					getDateMeantFor())).thenReturn(userTransactionList);
 
-	Map<Integer, List<UserTransaction>> categoryKeyAndUserTransactions = (Map<Integer, List<UserTransaction>>) getUserTransactionService()
-		.fetchUserTransaction(FINANCIAL_PORTFOLIO_ID, DATE_MEANT_FOR);
-	verify(getUserTransactionsRepository(), times(1)).findByFinancialPortfolioIdAndDate(FINANCIAL_PORTFOLIO_ID,
-		getDateMeantFor());
-	assertThat(categoryKeyAndUserTransactions).isNotEmpty();
-	assertTrue(CollectionUtils.isNotEmpty(categoryKeyAndUserTransactions.get(3)));
-    }
+			UserTransaction userTransactionSaved = new UserTransaction();
+			userTransactionSaved.setFinancialPortfolioId(FINANCIAL_PORTFOLIO_ID);
+			userTransactionSaved.setCategoryId(3);
+			userTransactionSaved.setAmount(600);
+			Mockito.when(getUserTransactionsRepository().save(Mockito.any())).thenReturn(userTransactionSaved);
 
-    /**
-     * TEST: Fetch user transactions by creation Date
-     */
-    @Test
-    public void fetchUserTransactionByCreationDate() {
+			Optional<UserTransaction> userBudgetReturnValue = userTransactionList.stream().findFirst();
+			when(userTransactionsRepository.findById(3)).thenReturn(userBudgetReturnValue);
 
-	List<UserTransaction> categoryKeyAndUserTransactions = getUserTransactionService()
-		.fetchUserTransactionByCreationDate(FINANCIAL_PORTFOLIO_ID_INT, DATE_MEANT_FOR);
-	verify(getUserTransactionsRepository(), times(1)).findByFinancialPortfolioIdAndDate(FINANCIAL_PORTFOLIO_ID,
-		getDateMeantFor());
-	assertThat(categoryKeyAndUserTransactions).isNotEmpty();
-	assertTrue(ERStringUtils.isNotEmpty(categoryKeyAndUserTransactions.get(0).getFinancialPortfolioId()));
-    }
+		} catch (ParseException e) {
+			logger.error(e + " Unable to add date to the user Transaction");
+		}
 
-    /**
-     * TEST: Save user transactions
-     */
-    @Test
-    public void saveUserTransaction() {
-	MultiValueMap<String, String> formData = new LinkedMultiValueMap<String, String>();
-	formData.add(DashboardConstants.Transactions.AMOUNT, "300");
-	formData.add(DashboardConstants.Transactions.DATE_MEANT_FOR, DATE_MEANT_FOR);
-	formData.add(DashboardConstants.Transactions.FINANCIAL_PORTFOLIO_ID, FINANCIAL_PORTFOLIO_ID);
-	formData.add(DashboardConstants.Transactions.CATEGORY_OPTIONS, "3");
+		// Set Category Id List
+		setCategoryIdList(new ArrayList<Integer>());
+		getCategoryIdList().add(3);
+		getCategoryIdList().add(4);
+		getCategoryIdList().add(5);
+		getCategoryIdList().add(6);
 
-	UserTransaction userTransactionsSaved = getUserTransactionService().saveUserTransaction(formData,
-		FINANCIAL_PORTFOLIO_ID);
-	assertThat(userTransactionsSaved).isNotNull();
-    }
+	}
 
-    /**
-     * TEST: Save user transactions
-     */
-    @Test(expected = ResourceNotFoundException.class)
-    public void saveUserTransactionException() {
-	MultiValueMap<String, String> formData = new LinkedMultiValueMap<String, String>();
-	formData.add(DashboardConstants.Transactions.DATE_MEANT_FOR, DATE_MEANT_FOR);
-	formData.add(DashboardConstants.Transactions.FINANCIAL_PORTFOLIO_ID, FINANCIAL_PORTFOLIO_ID);
-	formData.add(DashboardConstants.Transactions.CATEGORY_OPTIONS, "3");
+	/**
+	 * TEST: Fetch user transactions
+	 */
+	@SuppressWarnings("unchecked")
+	@Test
+	public void fetchUserTransaction() {
 
-	getUserTransactionService().saveUserTransaction(formData, FINANCIAL_PORTFOLIO_ID);
-    }
+		Map<Integer, List<UserTransaction>> categoryKeyAndUserTransactions = (Map<Integer, List<UserTransaction>>) getUserTransactionService()
+				.fetchUserTransaction(FINANCIAL_PORTFOLIO_ID, DATE_MEANT_FOR);
+		verify(getUserTransactionsRepository(), times(1)).findByFinancialPortfolioIdAndDate(FINANCIAL_PORTFOLIO_ID,
+				getDateMeantFor());
+		assertThat(categoryKeyAndUserTransactions).isNotEmpty();
+		assertTrue(CollectionUtils.isNotEmpty(categoryKeyAndUserTransactions.get(3)));
+	}
 
-    /**
-     * TEST: Delete user transactions
-     */
-    @Test
-    public void deleteUserTransactions() {
+	/**
+	 * TEST: Fetch user transactions by creation Date
+	 */
+	@Test
+	public void fetchUserTransactionByCreationDate() {
 
-	getUserTransactionService().deleteUserTransactions("3", FINANCIAL_PORTFOLIO_ID, DATE_MEANT_FOR);
+		List<UserTransaction> categoryKeyAndUserTransactions = getUserTransactionService()
+				.fetchUserTransactionByCreationDate(FINANCIAL_PORTFOLIO_ID, DATE_MEANT_FOR);
+		verify(getUserTransactionsRepository(), times(1)).findByFinancialPortfolioIdAndDate(FINANCIAL_PORTFOLIO_ID,
+				getDateMeantFor());
+		assertThat(categoryKeyAndUserTransactions).isNotEmpty();
+		assertTrue(ERStringUtils.isNotEmpty(categoryKeyAndUserTransactions.get(0).getFinancialPortfolioId()));
+	}
 
-	verify(getUserTransactionsRepository(), times(1)).deleteUsersWithIds(Mockito.any(),
-		Mockito.eq(FINANCIAL_PORTFOLIO_ID));
-    }
+	/**
+	 * TEST: Save user transactions
+	 */
+	@Test
+	public void saveUserTransaction() {
+		MultiValueMap<String, String> formData = new LinkedMultiValueMap<String, String>();
+		formData.add(DashboardConstants.Transactions.AMOUNT, "300");
+		formData.add(DashboardConstants.Transactions.DATE_MEANT_FOR, DATE_MEANT_FOR);
+		formData.add(DashboardConstants.Transactions.FINANCIAL_PORTFOLIO_ID, FINANCIAL_PORTFOLIO_ID);
+		formData.add(DashboardConstants.Transactions.CATEGORY_OPTIONS, "3");
 
-    /**
-     * TEST: Update user transactions
-     */
-    @Test
-    public void updateTransactions() {
+		UserTransaction userTransactionsSaved = getUserTransactionService().saveUserTransaction(formData,
+				FINANCIAL_PORTFOLIO_ID);
+		assertThat(userTransactionsSaved).isNotNull();
+	}
 
-	MultiValueMap<String, String> formData = new LinkedMultiValueMap<String, String>();
-	formData.add(DashboardConstants.Transactions.TRANSACTIONS__ID_JSON, "3");
-	formData.add(DashboardConstants.Transactions.CATEGORY_ID_JSON, "3");
+	/**
+	 * TEST: Save user transactions
+	 */
+	@Test(expected = ResourceNotFoundException.class)
+	public void saveUserTransactionException() {
+		MultiValueMap<String, String> formData = new LinkedMultiValueMap<String, String>();
+		formData.add(DashboardConstants.Transactions.DATE_MEANT_FOR, DATE_MEANT_FOR);
+		formData.add(DashboardConstants.Transactions.FINANCIAL_PORTFOLIO_ID, FINANCIAL_PORTFOLIO_ID);
+		formData.add(DashboardConstants.Transactions.CATEGORY_OPTIONS, "3");
 
-	getUserTransactionService().updateTransactions(formData,
-		DashboardConstants.Transactions.CATEGORY_FORM_FIELD_NAME, FINANCIAL_PORTFOLIO_ID);
-	verify(getUserTransactionsRepository(), times(1)).save(Mockito.any());
-    }
+		getUserTransactionService().saveUserTransaction(formData, FINANCIAL_PORTFOLIO_ID);
+	}
 
-    /**
-     * TEST: Fetch Average of total income or total expense
-     */
-    @Test
-    public void fetchLifetimeCalculations() {
+	/**
+	 * TEST: Delete user transactions
+	 */
+	@Test
+	public void deleteUserTransactions() {
 
-	getUserTransactionService().fetchLifetimeCalculations(TransactionType.EXPENSE, true, 3);
-	verify(getCategoryService(), times(1)).fetchCategories();
-	verify(getUserTransactionsRepository(), times(1)).findByFinancialPortfolioIdAndCategories(Mockito.anyString(),
-		Mockito.any());
-    }
+		getUserTransactionService().deleteUserTransactions("3", FINANCIAL_PORTFOLIO_ID, DATE_MEANT_FOR);
 
-    private Date getDateMeantFor() {
-	return dateMeantFor;
-    }
+		verify(getUserTransactionsRepository(), times(1)).deleteUsersWithIds(Mockito.any(),
+				Mockito.eq(FINANCIAL_PORTFOLIO_ID));
+	}
 
-    private void setDateMeantFor(Date dateMeantFor) {
-	this.dateMeantFor = dateMeantFor;
-    }
+	/**
+	 * TEST: Update user transactions
+	 */
+	@Test
+	public void updateTransactions() {
 
-    private List<Integer> getCategoryIdList() {
-	return categoryIdList;
-    }
+		MultiValueMap<String, String> formData = new LinkedMultiValueMap<String, String>();
+		formData.add(DashboardConstants.Transactions.TRANSACTIONS__ID_JSON, "3");
+		formData.add(DashboardConstants.Transactions.CATEGORY_ID_JSON, "3");
 
-    private void setCategoryIdList(List<Integer> categoryIdList) {
-	this.categoryIdList = categoryIdList;
-    }
+		getUserTransactionService().updateTransactions(formData,
+				DashboardConstants.Transactions.CATEGORY_FORM_FIELD_NAME, FINANCIAL_PORTFOLIO_ID);
+		verify(getUserTransactionsRepository(), times(1)).save(Mockito.any());
+	}
 
-    private UserTransactionService getUserTransactionService() {
-	return userTransactionService;
-    }
+	/**
+	 * TEST: Fetch Average of total income or total expense
+	 */
+	@Test
+	public void fetchLifetimeCalculations() {
 
-    private UserTransactionsRepository getUserTransactionsRepository() {
-	return userTransactionsRepository;
-    }
+		getUserTransactionService().fetchLifetimeCalculations(TransactionType.EXPENSE, true, "3");
+		verify(getCategoryService(), times(1)).fetchCategories();
+		verify(getUserTransactionsRepository(), times(1)).findByFinancialPortfolioIdAndCategories(Mockito.anyString(),
+				Mockito.any());
+	}
 
-    public CategoryService getCategoryService() {
-	return categoryService;
-    }
+	private Date getDateMeantFor() {
+		return dateMeantFor;
+	}
 
-    public void setCategoryService(CategoryService categoryService) {
-	this.categoryService = categoryService;
-    }
+	private void setDateMeantFor(Date dateMeantFor) {
+		this.dateMeantFor = dateMeantFor;
+	}
+
+	private List<Integer> getCategoryIdList() {
+		return categoryIdList;
+	}
+
+	private void setCategoryIdList(List<Integer> categoryIdList) {
+		this.categoryIdList = categoryIdList;
+	}
+
+	private UserTransactionService getUserTransactionService() {
+		return userTransactionService;
+	}
+
+	private UserTransactionsRepository getUserTransactionsRepository() {
+		return userTransactionsRepository;
+	}
+
+	public CategoryService getCategoryService() {
+		return categoryService;
+	}
+
+	public void setCategoryService(CategoryService categoryService) {
+		this.categoryService = categoryService;
+	}
 
 }

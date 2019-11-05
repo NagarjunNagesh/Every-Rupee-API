@@ -17,12 +17,12 @@ import in.co.everyrupee.pojo.user.BankAccount;
 @Repository
 public interface BankAccountRepository extends JpaRepository<BankAccount, Integer> {
 
-    /**
-     * Fetch all bank account by financial Portfolio id
-     * 
-     * @param financialPortfolioId
-     * @return
-     */
-    List<BankAccount> findByFinancialPortfolioId(Integer financialPortfolioId);
+	/**
+	 * Fetch all bank account by financial Portfolio id
+	 * 
+	 * @param financialPortfolioId
+	 * @return
+	 */
+	List<BankAccount> findByFinancialPortfolioId(String financialPortfolioId);
 
 }

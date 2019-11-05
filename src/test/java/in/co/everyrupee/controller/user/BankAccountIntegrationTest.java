@@ -55,7 +55,8 @@ public class BankAccountIntegrationTest {
 
 	private MockMvc mvc;
 
-	private static final Integer FINANCIAL_PORTFOLIO_ID = 193000000;
+	private static final String FINANCIAL_PORTFOLIO_ID = "193000000";
+	private static final int USER_ID = 193000000;
 
 	private List<BankAccount> allBankAccounts;
 
@@ -79,7 +80,7 @@ public class BankAccountIntegrationTest {
 		bankAccount2.setNumberOfTimesSelected(100);
 		bankAccount2.setAccountBalance(324);
 		bankAccount2.setAccountType(AccountType.CASH);
-		bankAccount2.setUserId(FINANCIAL_PORTFOLIO_ID);
+		bankAccount2.setUserId(USER_ID);
 
 		BankAccount bankAccount = new BankAccount();
 		bankAccount.setFinancialPortfolioId(FINANCIAL_PORTFOLIO_ID);
@@ -88,7 +89,7 @@ public class BankAccountIntegrationTest {
 		bankAccount.setNumberOfTimesSelected(1);
 		bankAccount.setAccountBalance(100);
 		bankAccount.setAccountType(AccountType.CREDITCARD);
-		bankAccount.setUserId(FINANCIAL_PORTFOLIO_ID);
+		bankAccount.setUserId(USER_ID);
 
 		setAllBankAccounts(new ArrayList<BankAccount>());
 		getAllBankAccounts().add(bankAccount);
