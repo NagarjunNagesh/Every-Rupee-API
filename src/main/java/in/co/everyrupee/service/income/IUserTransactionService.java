@@ -10,20 +10,20 @@ import in.co.everyrupee.pojo.income.UserTransaction;
 
 public interface IUserTransactionService {
 
-    Object fetchUserTransaction(String financialPortfolioId, String dateMeantFor);
+	Object fetchUserTransaction(String financialPortfolioId, String dateMeantFor);
 
-    UserTransaction saveUserTransaction(MultiValueMap<String, String> formData, String financialPortfolioId);
+	UserTransaction saveUserTransaction(MultiValueMap<String, String> formData, String financialPortfolioId);
 
-    void deleteUserTransactions(String transactionalIds, String financialPortfolioId, String dateMeantFor);
+	void deleteUserTransactions(String transactionalIds, String financialPortfolioId, String dateMeantFor);
 
-    UserTransaction updateTransactions(MultiValueMap<String, String> formData, String formFieldName,
-	    String financialPortfolioId);
+	UserTransaction updateTransactions(MultiValueMap<String, String> formData, String formFieldName,
+			String financialPortfolioId);
 
-    Map<Integer, Double> fetchCategoryTotalAndUpdateUserBudget(String financialPortfolioId, String dateMeantFor,
-	    boolean updateBudget);
+	Map<Integer, Double> fetchCategoryTotalAndUpdateUserBudget(String financialPortfolioId, String dateMeantFor,
+			boolean updateBudget);
 
-    List<UserTransaction> fetchUserTransactionByCreationDate(Integer financialPortfolioId, String dateMeantFor);
+	List<UserTransaction> fetchUserTransactionByCreationDate(String financialPortfolioId, String dateMeantFor);
 
-    Object fetchLifetimeCalculations(TransactionType type, boolean fetchAverage, Integer pFinancialPortfolioId);
+	Object fetchLifetimeCalculations(TransactionType type, boolean fetchAverage, String pFinancialPortfolioId);
 
 }

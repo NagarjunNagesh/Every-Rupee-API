@@ -22,7 +22,6 @@ import in.co.everyrupee.constants.income.DashboardConstants;
 import in.co.everyrupee.events.income.OnSaveTransactionCompleteEvent;
 import in.co.everyrupee.pojo.income.UserTransaction;
 import in.co.everyrupee.service.income.IUserTransactionService;
-import in.co.everyrupee.service.login.ProfileService;
 import in.co.everyrupee.utils.GenericResponse;
 
 /**
@@ -42,9 +41,6 @@ public class UserTransactionsController {
 	@Autowired
 	private ApplicationEventPublisher eventPublisher;
 
-	@Autowired
-	private ProfileService profileService;
-
 	/**
 	 * Get a Single User Transaction
 	 * 
@@ -57,7 +53,6 @@ public class UserTransactionsController {
 			@PathVariable @Size(min = 0, max = GenericConstants.MAX_ALLOWED_LENGTH_FINANCIAL_PORTFOLIO) String pFinancialPortfolioId,
 			Principal userPrincipal,
 			@RequestParam(DashboardConstants.Transactions.DATE_MEANT_FOR) @Size(min = 0, max = 10) String dateMeantFor) {
-		getProfileService().validateUser(userPrincipal, pFinancialPortfolioId);
 
 		return userTransactionService.fetchUserTransaction(pFinancialPortfolioId, dateMeantFor);
 	}
@@ -75,7 +70,6 @@ public class UserTransactionsController {
 			Principal userPrincipal,
 			@RequestParam(DashboardConstants.Transactions.DATE_MEANT_FOR) @Size(min = 0, max = 10) String dateMeantFor,
 			@RequestParam(DashboardConstants.Transactions.UPDATE_BUDGET_PARAM) boolean updateBudget) {
-		getProfileService().validateUser(userPrincipal, pFinancialPortfolioId);
 
 		return userTransactionService.fetchCategoryTotalAndUpdateUserBudget(pFinancialPortfolioId, dateMeantFor,
 				updateBudget);
@@ -93,7 +87,6 @@ public class UserTransactionsController {
 	public UserTransaction save(
 			@PathVariable @Size(min = 0, max = GenericConstants.MAX_ALLOWED_LENGTH_FINANCIAL_PORTFOLIO) String pFinancialPortfolioId,
 			@RequestBody MultiValueMap<String, String> formData, Principal userPrincipal) {
-		getProfileService().validateUser(userPrincipal, pFinancialPortfolioId);
 
 		UserTransaction userTransactionResponse = userTransactionService.saveUserTransaction(formData,
 				pFinancialPortfolioId);
@@ -117,7 +110,6 @@ public class UserTransactionsController {
 			@PathVariable @Size(min = 0, max = GenericConstants.MAX_ALLOWED_LENGTH_FINANCIAL_PORTFOLIO) String pFinancialPortfolioId,
 			@PathVariable String transactionIds, Principal userPrincipal,
 			@RequestParam(DashboardConstants.Transactions.DATE_MEANT_FOR) @Size(min = 0, max = 10) String dateMeantFor) {
-		getProfileService().validateUser(userPrincipal, pFinancialPortfolioId);
 
 		userTransactionService.deleteUserTransactions(transactionIds, pFinancialPortfolioId, dateMeantFor);
 
@@ -139,16 +131,11 @@ public class UserTransactionsController {
 			@PathVariable @Size(min = 0, max = GenericConstants.MAX_ALLOWED_LENGTH_FINANCIAL_PORTFOLIO) String pFinancialPortfolioId,
 			@PathVariable @Size(min = 0, max = GenericConstants.MAX_ALLOWED_LENGTH_FINANCIAL_PORTFOLIO) String formFieldName,
 			@RequestBody MultiValueMap<String, String> formData, Principal userPrincipal) {
-		getProfileService().validateUser(userPrincipal, pFinancialPortfolioId);
 
 		UserTransaction userTransactionSaved = userTransactionService.updateTransactions(formData, formFieldName,
 				pFinancialPortfolioId);
 
 		return userTransactionSaved;
-	}
-
-	private ProfileService getProfileService() {
-		return profileService;
 	}
 
 }

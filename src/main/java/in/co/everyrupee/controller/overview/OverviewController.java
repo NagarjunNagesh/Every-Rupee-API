@@ -44,8 +44,7 @@ public class OverviewController {
 			@RequestParam(DashboardConstants.Overview.DATE_MEANT_FOR) @Size(min = 0, max = 10) String dateMeantFor,
 			@RequestParam(DashboardConstants.Overview.FINANCIAL_PORTFOLIO_ID) @Size(min = 0, max = GenericConstants.MAX_ALLOWED_LENGTH_FINANCIAL_PORTFOLIO) String pFinancialPortfolioId) {
 
-		return getUserTransactionService().fetchUserTransactionByCreationDate(Integer.parseInt(pFinancialPortfolioId),
-				dateMeantFor);
+		return getUserTransactionService().fetchUserTransactionByCreationDate(pFinancialPortfolioId, dateMeantFor);
 	}
 
 	/**
@@ -62,8 +61,7 @@ public class OverviewController {
 			@RequestParam(DashboardConstants.Overview.AVERAGE_PARAM) boolean fetchAverage,
 			@RequestParam(DashboardConstants.Overview.FINANCIAL_PORTFOLIO_ID) @Size(min = 0, max = GenericConstants.MAX_ALLOWED_LENGTH_FINANCIAL_PORTFOLIO) String pFinancialPortfolioId) {
 
-		return getUserTransactionService().fetchLifetimeCalculations(type, fetchAverage,
-				Integer.parseInt(pFinancialPortfolioId));
+		return getUserTransactionService().fetchLifetimeCalculations(type, fetchAverage, pFinancialPortfolioId);
 	}
 
 	private IUserTransactionService getUserTransactionService() {

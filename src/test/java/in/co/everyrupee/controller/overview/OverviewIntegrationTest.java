@@ -2,7 +2,6 @@ package in.co.everyrupee.controller.overview;
 
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -25,7 +24,6 @@ import org.springframework.web.context.WebApplicationContext;
 import in.co.everyrupee.constants.income.DashboardConstants;
 import in.co.everyrupee.pojo.TransactionType;
 import in.co.everyrupee.repository.income.UserTransactionsRepository;
-import in.co.everyrupee.service.login.ProfileService;
 
 /**
  * Overview Controller Test (Controller)
@@ -41,20 +39,17 @@ public class OverviewIntegrationTest {
 	private WebApplicationContext context;
 
 	@MockBean
-	private ProfileService profileService;
-
-	@MockBean
 	private UserTransactionsRepository UserTransactionRepository;
 
 	private MockMvc mvc;
 
 	private static final String DATE_MEANT_FOR = "01082019";
+	private static final String FINANCIAL_PORTFOLIO_ID = "193000000";
 
 	@Before
 	public void setUp() {
 		setMvc(MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build());
 
-		when(getProfileService().validateUser(Mockito.any())).thenReturn(1);
 	}
 
 	/**
@@ -67,7 +62,9 @@ public class OverviewIntegrationTest {
 	public void getUserTransactionsByFinancialPortfolioId() throws Exception {
 
 		getMvc().perform(get("/api/overview/recentTransactions").contentType(MediaType.APPLICATION_JSON)
-				.param(DashboardConstants.Overview.DATE_MEANT_FOR, DATE_MEANT_FOR)).andExpect(status().isOk());
+				.param(DashboardConstants.Overview.DATE_MEANT_FOR, DATE_MEANT_FOR)
+				.param(DashboardConstants.Overview.FINANCIAL_PORTFOLIO_ID, FINANCIAL_PORTFOLIO_ID))
+				.andExpect(status().isOk());
 
 		verify(getUserTransactionRepository(), times(1)).findByFinancialPortfolioIdAndDate(Mockito.anyString(),
 				Mockito.any());
@@ -85,7 +82,9 @@ public class OverviewIntegrationTest {
 
 		getMvc().perform(get("/api/overview/lifetime").contentType(MediaType.APPLICATION_JSON)
 				.param(DashboardConstants.Overview.TYPE_PARAM, TransactionType.INCOME.toString())
-				.param(DashboardConstants.Overview.AVERAGE_PARAM, "true")).andExpect(status().isOk());
+				.param(DashboardConstants.Overview.AVERAGE_PARAM, "true")
+				.param(DashboardConstants.Overview.FINANCIAL_PORTFOLIO_ID, FINANCIAL_PORTFOLIO_ID))
+				.andExpect(status().isOk());
 
 		verify(getUserTransactionRepository(), times(1)).findByFinancialPortfolioIdAndCategories(Mockito.anyString(),
 				Mockito.any());
@@ -97,10 +96,6 @@ public class OverviewIntegrationTest {
 
 	private void setMvc(MockMvc mvc) {
 		this.mvc = mvc;
-	}
-
-	private ProfileService getProfileService() {
-		return profileService;
 	}
 
 	private UserTransactionsRepository getUserTransactionRepository() {

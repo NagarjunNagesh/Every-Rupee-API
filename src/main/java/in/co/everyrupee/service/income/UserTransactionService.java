@@ -254,7 +254,7 @@ public class UserTransactionService implements IUserTransactionService {
 	 * OVERVIEW: Fetches the user transactions with by creation date (WITHOUT SORT)
 	 */
 	@Override
-	public List<UserTransaction> fetchUserTransactionByCreationDate(Integer financialPortfolioId, String dateMeantFor) {
+	public List<UserTransaction> fetchUserTransactionByCreationDate(String financialPortfolioId, String dateMeantFor) {
 
 		if (financialPortfolioId == null) {
 			throw new InvalidAttributeValueException("fetchUserTransactionByCreationDate", "financialPortfolioId",
@@ -270,8 +270,7 @@ public class UserTransactionService implements IUserTransactionService {
 			LOGGER.error(e + " Unable to add date to the user Transaction");
 			return userTransactions;
 		}
-		userTransactions = userTransactionsRepository.findByFinancialPortfolioIdAndDate(financialPortfolioId.toString(),
-				date);
+		userTransactions = userTransactionsRepository.findByFinancialPortfolioIdAndDate(financialPortfolioId, date);
 
 		if (CollectionUtils.isEmpty(userTransactions)) {
 			User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -285,7 +284,7 @@ public class UserTransactionService implements IUserTransactionService {
 	 * OVERVIEW: Fetch lifetime calculations
 	 */
 	@Override
-	public Object fetchLifetimeCalculations(TransactionType type, boolean fetchAverage, Integer pfinancialPortfolioId) {
+	public Object fetchLifetimeCalculations(TransactionType type, boolean fetchAverage, String pfinancialPortfolioId) {
 
 		if (pfinancialPortfolioId == null) {
 			throw new InvalidAttributeValueException("fetchUserTransactionByCreationDate", "financialPortfolioId",
@@ -315,7 +314,7 @@ public class UserTransactionService implements IUserTransactionService {
 	 * @param fetchAverage
 	 * @param pFinancialPortfolioId
 	 */
-	private Object calculateLifetimeForExpenseOrIncome(boolean fetchAverage, Integer pFinancialPortfolioId,
+	private Object calculateLifetimeForExpenseOrIncome(boolean fetchAverage, String pFinancialPortfolioId,
 			String parentCategoryId) {
 
 		List<Category> categories = categoryService.fetchCategories();
@@ -332,7 +331,7 @@ public class UserTransactionService implements IUserTransactionService {
 		currentCategories = GenericUtils.removeAll(currentCategories, -1);
 
 		List<UserTransaction> lifetimeTransactions = userTransactionsRepository
-				.findByFinancialPortfolioIdAndCategories(pFinancialPortfolioId.toString(), currentCategories);
+				.findByFinancialPortfolioIdAndCategories(pFinancialPortfolioId, currentCategories);
 
 		// If the transaction is empty then return null
 		if (CollectionUtils.isEmpty(lifetimeTransactions)) {
