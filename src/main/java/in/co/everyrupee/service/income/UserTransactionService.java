@@ -25,8 +25,6 @@ import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.MultiValueMap;
@@ -273,8 +271,7 @@ public class UserTransactionService implements IUserTransactionService {
 		userTransactions = userTransactionsRepository.findByFinancialPortfolioIdAndDate(financialPortfolioId, date);
 
 		if (CollectionUtils.isEmpty(userTransactions)) {
-			User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-			LOGGER.warn("user transactions data is empty for user ", user.getUsername());
+			LOGGER.warn("user transactions data is empty for user ");
 		}
 
 		return userTransactions;

@@ -20,8 +20,10 @@ version = '0.0.1-SNAPSHOT'
 
 bootJar {
     baseName = 'bb-core'
-    version =  '0.0.2'
+    version =  '0.0.3'
 }
+
+apply plugin : 'eclipse'
 
 // Default Spring Profile
 //springProfile = 'dev'
