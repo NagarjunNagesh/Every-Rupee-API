@@ -50,7 +50,6 @@ public class BankAccountService implements IBankAccountService {
 		BankAccount newAccount = new BankAccount();
 		newAccount.setLinked(Boolean.parseBoolean(formData.getFirst(BankAccountConstants.LINKED_ACCOUNT_PARAM)));
 		newAccount.setFinancialPortfolioId(formData.getFirst(BankAccountConstants.FINANCIAL_PORTFOLIO_ID_PARAM));
-		newAccount.setUserId(Integer.parseInt(formData.getFirst(BankAccountConstants.USER_ID_PARAM)));
 		newAccount.setBankAccountName(formData.getFirst(BankAccountConstants.BANK_ACCOUNT_NAME_PARAM));
 		newAccount.setAccountBalance(Double.parseDouble(formData.getFirst(BankAccountConstants.ACCOUNT_BALANCE_PARAM)));
 		// Replace all space in the text to without space
