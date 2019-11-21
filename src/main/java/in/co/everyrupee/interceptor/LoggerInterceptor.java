@@ -23,7 +23,6 @@ public class LoggerInterceptor implements HandlerInterceptor {
 
 	private static final String EVERY_RUPEE_APPLICATION_NAME = "EveryRupeeApplication";
 	private static final String LOGID_FOR_LOGBACK = "logid";
-	private static final String LOG_DEBUG_PRE_HANDLER_MESSAGE = "Pre Handle method is called for log-";
 
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -31,7 +30,6 @@ public class LoggerInterceptor implements HandlerInterceptor {
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws Exception {
 		MDC.put(LOGID_FOR_LOGBACK, EVERY_RUPEE_APPLICATION_NAME);
-		logger.debug(LOG_DEBUG_PRE_HANDLER_MESSAGE + EVERY_RUPEE_APPLICATION_NAME);
 		return true;
 	}
 

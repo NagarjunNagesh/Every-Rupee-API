@@ -66,11 +66,6 @@ public class BankAccount {
 	private String financialPortfolioId;
 
 	@NotNull
-	@Column(name = BankAccountConstants.USER_ID)
-	@JsonProperty(access = Access.WRITE_ONLY)
-	private Integer userId;
-
-	@NotNull
 	@Column(name = BankAccountConstants.ACCOUNT_BALANCE)
 	private double accountBalance;
 
@@ -133,14 +128,6 @@ public class BankAccount {
 
 	public void setFinancialPortfolioId(String financialPortfolioId) {
 		this.financialPortfolioId = financialPortfolioId;
-	}
-
-	public Integer getUserId() {
-		return userId;
-	}
-
-	public void setUserId(Integer userId) {
-		this.userId = userId;
 	}
 
 	public double getAccountBalance() {
