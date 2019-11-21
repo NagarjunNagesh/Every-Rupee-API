@@ -1,7 +1,5 @@
 package in.co.everyrupee.controller.overview;
 
-import java.security.Principal;
-
 import javax.validation.Valid;
 import javax.validation.constraints.Size;
 
@@ -40,7 +38,7 @@ public class OverviewController {
 	 * @return
 	 */
 	@RequestMapping(value = "/recentTransactions", method = RequestMethod.GET)
-	public Object getUserTransactionByFinancialPortfolioId(Principal userPrincipal,
+	public Object getUserTransactionByFinancialPortfolioId(
 			@RequestParam(DashboardConstants.Overview.DATE_MEANT_FOR) @Size(min = 0, max = 10) String dateMeantFor,
 			@RequestParam(DashboardConstants.Overview.FINANCIAL_PORTFOLIO_ID) @Size(min = 0, max = GenericConstants.MAX_ALLOWED_LENGTH_FINANCIAL_PORTFOLIO) String pFinancialPortfolioId) {
 
@@ -56,7 +54,7 @@ public class OverviewController {
 	 * @return
 	 */
 	@RequestMapping(value = "/lifetime", method = RequestMethod.GET)
-	public Object getLifetimeIncomeByFinancialPortfolioId(Principal userPrincipal,
+	public Object getLifetimeIncomeByFinancialPortfolioId(
 			@Valid @RequestParam(DashboardConstants.Overview.TYPE_PARAM) TransactionType type,
 			@RequestParam(DashboardConstants.Overview.AVERAGE_PARAM) boolean fetchAverage,
 			@RequestParam(DashboardConstants.Overview.FINANCIAL_PORTFOLIO_ID) @Size(min = 0, max = GenericConstants.MAX_ALLOWED_LENGTH_FINANCIAL_PORTFOLIO) String pFinancialPortfolioId) {

@@ -86,8 +86,9 @@ public class OverviewIntegrationTest {
 				.param(DashboardConstants.Overview.FINANCIAL_PORTFOLIO_ID, FINANCIAL_PORTFOLIO_ID))
 				.andExpect(status().isOk());
 
-		verify(getUserTransactionRepository(), times(1)).findByFinancialPortfolioIdAndCategories(Mockito.anyString(),
-				Mockito.any());
+		verify(getUserTransactionRepository(),
+		 times(1)).findByFinancialPortfolioIdAndCategories(Mockito.anyString(),
+		 Mockito.any());
 	}
 
 	private MockMvc getMvc() {
