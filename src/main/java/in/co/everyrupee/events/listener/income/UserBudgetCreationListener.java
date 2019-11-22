@@ -56,7 +56,8 @@ public class UserBudgetCreationListener implements IUserBudgetCreationListener {
 
 		try {
 			MultiValueMap<String, String> formData = event.getFormData();
-
+			logger.debug("creating user transaction for the financial portfolio - " + event.getFinancialPortfolioId());
+			
 			if (CollectionUtils.isEmpty(formData.get(DashboardConstants.Transactions.CATEGORY_OPTIONS))
 					|| ERStringUtils.isBlank(formData.get(DashboardConstants.Transactions.CATEGORY_OPTIONS).get(0))
 					|| CollectionUtils.isEmpty(formData.get(DashboardConstants.Transactions.AMOUNT))
