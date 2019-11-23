@@ -338,4 +338,12 @@ public class UserBudgetServiceTest {
 		this.userBudgetList = userBudgetList;
 	}
 
+	public IUserTransactionService getUserTransactionService() {
+		return userTransactionService;
+	}
+
+	public void setUserTransactionService(IUserTransactionService userTransactionService) {
+		this.userTransactionService = userTransactionService;
+	}
+
 }
