@@ -6,6 +6,8 @@ import java.util.Optional;
 import javax.transaction.Transactional;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,8 @@ public class CategoryService implements ICategoryService {
 	@Autowired
 	private CategoryRepository categoryRepository;
 
+	Logger LOGGER = LoggerFactory.getLogger(this.getClass());
+
 	@Override
 	@Cacheable(value = DashboardConstants.Category.CATEGORY_CACHE_NAME, key = "#root.method.name")
 	public List<Category> fetchCategories() {
@@ -36,7 +40,7 @@ public class CategoryService implements ICategoryService {
 	}
 
 	@Override
-	@Cacheable(value = DashboardConstants.Category.CATEGORY_INCOME_OR_NOT, key = "#root.method.name")
+	@Cacheable(value = DashboardConstants.Category.CATEGORY_INCOME_OR_NOT, key = "#categoryId")
 	public Boolean categoryIncome(int categoryId) {
 		List<Category> categoriesList = categoryRepository.fetchAllCategories();
 
@@ -48,13 +52,16 @@ public class CategoryService implements ICategoryService {
 
 		if (category.isPresent()) {
 			Category currentCategory = category.get();
-			if (ERStringUtils.equalsIgnoreCase(currentCategory.getParentCategory(), GenericConstants.INCOME_CATEGORY)) {
+			boolean categoryIncome = ERStringUtils.equalsIgnoreCase(currentCategory.getParentCategory(),
+					GenericConstants.INCOME_CATEGORY);
+			LOGGER.debug("Category to search is " + categoryId + " which is a category income - " + categoryIncome);
+			if (categoryIncome) {
 				return true;
 			}
 			return false;
 		}
 
-		return null;
+		return false;
 	}
 
 }

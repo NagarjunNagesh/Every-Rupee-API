@@ -51,7 +51,7 @@ public class UserBudgetUpdationListener implements IUserBudgetUpdationListener {
 		try {
 			Map<Integer, Double> categoryIdAndCategoryTotal = event.getCategoryIdAndTotalAmount();
 			String dateMeantFor = event.getDateMeantFor();
-			logger.debug("creating user transaction for the financial portfolio - " + event.getFinancialPortfolioId());
+			logger.debug("Updating user budget for the financial portfolio - " + event.getFinancialPortfolioId());
 
 			if (categoryIdAndCategoryTotal == null || dateMeantFor == null) {
 				return;

@@ -8,6 +8,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import in.co.everyrupee.constants.GenericConstants;
+import in.co.everyrupee.events.listener.income.UserBudgetCreationListener;
+import in.co.everyrupee.events.listener.income.UserBudgetUpdationListener;
 
 /**
  * Initializing Every Rupee Application
@@ -29,6 +31,26 @@ public class EveryRupeeApplication {
 	public BCryptPasswordEncoder passwordEncoder() {
 		BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
 		return bCryptPasswordEncoder;
+	}
+
+	/**
+	 * Initialize Listener properly
+	 * 
+	 * @return
+	 */
+	@Bean
+	public UserBudgetCreationListener getUserBudgetCreationListener() {
+		return new UserBudgetCreationListener();
+	}
+
+	/**
+	 * Initialize Listener properly
+	 * 
+	 * @return
+	 */
+	@Bean
+	public UserBudgetUpdationListener getUserBudgetUpdationListener() {
+		return new UserBudgetUpdationListener();
 	}
 
 	public static void main(String[] args) {

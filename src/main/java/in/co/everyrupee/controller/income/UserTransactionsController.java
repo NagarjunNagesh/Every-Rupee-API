@@ -6,7 +6,6 @@ import java.util.Map;
 import javax.validation.constraints.Size;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.MediaType;
 import org.springframework.util.MultiValueMap;
 import org.springframework.validation.annotation.Validated;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import in.co.everyrupee.constants.GenericConstants;
 import in.co.everyrupee.constants.income.DashboardConstants;
-import in.co.everyrupee.events.income.OnSaveTransactionCompleteEvent;
 import in.co.everyrupee.pojo.income.UserTransaction;
 import in.co.everyrupee.service.income.IUserTransactionService;
 import in.co.everyrupee.utils.GenericResponse;
@@ -37,9 +35,6 @@ public class UserTransactionsController {
 
 	@Autowired
 	private IUserTransactionService userTransactionService;
-
-	@Autowired
-	private ApplicationEventPublisher eventPublisher;
 
 	/**
 	 * Get a Single User Transaction
@@ -90,9 +85,6 @@ public class UserTransactionsController {
 
 		UserTransaction userTransactionResponse = userTransactionService.saveUserTransaction(formData,
 				pFinancialPortfolioId);
-
-		// Auto Create Budget on saving the transaction
-		eventPublisher.publishEvent(new OnSaveTransactionCompleteEvent(pFinancialPortfolioId, formData));
 
 		return userTransactionResponse;
 	}
