@@ -32,6 +32,7 @@ import org.springframework.util.MultiValueMap;
 import in.co.everyrupee.constants.GenericConstants;
 import in.co.everyrupee.constants.income.DashboardConstants;
 import in.co.everyrupee.events.income.OnFetchCategoryTotalCompleteEvent;
+import in.co.everyrupee.events.income.OnSaveTransactionCompleteEvent;
 import in.co.everyrupee.exception.InvalidAttributeValueException;
 import in.co.everyrupee.exception.ResourceNotFoundException;
 import in.co.everyrupee.pojo.RecurrencePeriod;
@@ -146,6 +147,14 @@ public class UserTransactionService implements IUserTransactionService {
 		}
 
 		UserTransaction userTransactionResponse = userTransactionsRepository.save(userTransaction);
+
+		// Auto Create Budget on saving the transaction
+		String categoryId = formData.getFirst(DashboardConstants.Transactions.CATEGORY_OPTIONS);
+		boolean categoryIncome = ERStringUtils.isEmpty(categoryId) ? false
+				: categoryService.categoryIncome(Integer.parseInt(categoryId));
+		if (categoryIncome) {
+			eventPublisher.publishEvent(new OnSaveTransactionCompleteEvent(pFinancialPortfolioId, formData));
+		}
 
 		return userTransactionResponse;
 	}

@@ -1,4 +1,0 @@
-# Application Listeners
-org.springframework.context.ApplicationListener=\
-in.co.everyrupee.events.listener.income.IUserBudgetCreationListener,\
-in.co.everyrupee.events.listener.income.IUserBudgetUpdationListener
