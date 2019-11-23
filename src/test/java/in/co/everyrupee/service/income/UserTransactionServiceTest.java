@@ -98,6 +98,10 @@ public class UserTransactionServiceTest {
 			Optional<UserTransaction> userBudgetReturnValue = userTransactionList.stream().findFirst();
 			when(userTransactionsRepository.findById(3)).thenReturn(userBudgetReturnValue);
 
+			// Mock fetchUserTransactionWithCategoryId
+			when(getUserTransactionsRepository().fetchUserTransactionWithCategoryId(3, FINANCIAL_PORTFOLIO_ID,
+					getDateMeantFor())).thenReturn(userTransactionList);
+
 		} catch (ParseException e) {
 			logger.error(e + " Unable to add date to the user Transaction");
 		}
@@ -138,6 +142,18 @@ public class UserTransactionServiceTest {
 				getDateMeantFor());
 		assertThat(categoryKeyAndUserTransactions).isNotEmpty();
 		assertTrue(ERStringUtils.isNotEmpty(categoryKeyAndUserTransactions.get(0).getFinancialPortfolioId()));
+	}
+
+	/**
+	 * TEST: Fetch user transactions by category total
+	 */
+	@Test
+	public void fetchUserTransactionCategoryTotal() {
+		Double categoryTotal = getUserTransactionService().fetchUserTransactionCategoryTotal(FINANCIAL_PORTFOLIO_ID, 3,
+				getDateMeantFor());
+		verify(getUserTransactionsRepository(), times(1)).fetchUserTransactionWithCategoryId(3, FINANCIAL_PORTFOLIO_ID,
+				getDateMeantFor());
+		assertThat(categoryTotal).isEqualTo(300d);
 	}
 
 	/**

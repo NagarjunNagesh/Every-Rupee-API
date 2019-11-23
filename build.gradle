@@ -20,7 +20,7 @@ version = '0.0.1-SNAPSHOT'
 
 bootJar {
     baseName = 'bb-core'
-    version =  '0.0.3'
+    version =  '0.5.28'
 }
 
 apply plugin : 'eclipse'
