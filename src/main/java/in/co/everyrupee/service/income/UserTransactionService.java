@@ -258,6 +258,25 @@ public class UserTransactionService implements IUserTransactionService {
 	}
 
 	/**
+	 * BUDGET: Fetch category total
+	 */
+	@Override
+	public Double fetchUserTransactionCategoryTotal(String financialPortfolioId, Integer categoryId,
+			Date dateMeantFor) {
+
+		Double categoryTotal = 0.0d;
+
+		List<UserTransaction> userTransactions = userTransactionsRepository
+				.fetchUserTransactionWithCategoryId(categoryId, financialPortfolioId, dateMeantFor);
+
+		categoryTotal = userTransactions.stream().filter(Objects::nonNull)
+				.collect(Collectors.summingDouble(UserTransaction::getAmount));
+
+		return categoryTotal;
+
+	}
+
+	/**
 	 * OVERVIEW: Fetches the user transactions with by creation date (WITHOUT SORT)
 	 */
 	@Override

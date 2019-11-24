@@ -21,39 +21,48 @@ import in.co.everyrupee.pojo.income.UserTransaction;
  */
 @Repository
 public interface UserTransactionsRepository extends JpaRepository<UserTransaction, Integer> {
-    /**
-     * 
-     * @param financialPortfolioId
-     * @return
-     */
-    List<UserTransaction> findByFinancialPortfolioId(String financialPortfolioId);
+	/**
+	 * 
+	 * @param financialPortfolioId
+	 * @return
+	 */
+	List<UserTransaction> findByFinancialPortfolioId(String financialPortfolioId);
 
-    /**
-     * Find all the transactions for the month specified (Orders by creation date
-     * desc)
-     * 
-     * @param financialPortfolioId
-     * @param dateMeantFor
-     * @return
-     */
-    @Query("select u from UserTransaction u where u.financialPortfolioId in ?1 and u.dateMeantFor in ?2 order by date(createDate) desc ")
-    List<UserTransaction> findByFinancialPortfolioIdAndDate(String financialPortfolioId, Date dateMeantFor);
+	/**
+	 * Find all the transactions for the month specified (Orders by creation date
+	 * desc)
+	 * 
+	 * @param financialPortfolioId
+	 * @param dateMeantFor
+	 * @return
+	 */
+	@Query("select u from UserTransaction u where u.financialPortfolioId in ?1 and u.dateMeantFor in ?2 order by date(createDate) desc ")
+	List<UserTransaction> findByFinancialPortfolioIdAndDate(String financialPortfolioId, Date dateMeantFor);
 
-    /**
-     * Delete all user with ids specified in {@code ids} parameter
-     * 
-     * @param ids List of user ids
-     */
-    @Modifying
-    @Query("delete from UserTransaction u where u.id in ?1 and u.financialPortfolioId in ?2")
-    void deleteUsersWithIds(List<Integer> ids, String financialPortfolioId);
+	/**
+	 * Delete all user with ids specified in {@code ids} parameter
+	 * 
+	 * @param ids List of user ids
+	 */
+	@Modifying
+	@Query("delete from UserTransaction u where u.id in ?1 and u.financialPortfolioId in ?2")
+	void deleteUsersWithIds(List<Integer> ids, String financialPortfolioId);
 
-    /**
-     * 
-     * @param financialPortfolioId
-     * @return
-     */
-    @Query("select u from UserTransaction u where u.financialPortfolioId in ?1 and u.categoryId in ?2 order by date(createDate) asc ")
-    List<UserTransaction> findByFinancialPortfolioIdAndCategories(String financialPortfolioId,
-	    List<Integer> categoryIds);
+	/**
+	 * 
+	 * @param financialPortfolioId
+	 * @return
+	 */
+	@Query("select u from UserTransaction u where u.financialPortfolioId in ?1 and u.categoryId in ?2 order by date(createDate) asc ")
+	List<UserTransaction> findByFinancialPortfolioIdAndCategories(String financialPortfolioId,
+			List<Integer> categoryIds);
+
+	/**
+	 * Fetches all user with category ids specified in {@code ids} parameter
+	 * 
+	 * @param ids List of category ids
+	 */
+	@Query("SELECT u FROM UserTransaction u where u.categoryId in ?1 and u.financialPortfolioId in ?2 and u.dateMeantFor in ?3")
+	List<UserTransaction> fetchUserTransactionWithCategoryId(Integer categoryId, String financialPortfolioId,
+			Date dateMeantFor);
 }

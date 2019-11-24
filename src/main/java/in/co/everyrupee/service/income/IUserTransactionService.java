@@ -1,5 +1,6 @@
 package in.co.everyrupee.service.income;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -25,5 +26,7 @@ public interface IUserTransactionService {
 	List<UserTransaction> fetchUserTransactionByCreationDate(String financialPortfolioId, String dateMeantFor);
 
 	Object fetchLifetimeCalculations(TransactionType type, boolean fetchAverage, String pFinancialPortfolioId);
+
+	Double fetchUserTransactionCategoryTotal(String financialPortfolioId, Integer categoryId, Date dateMeantFor);
 
 }

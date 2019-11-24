@@ -63,6 +63,7 @@ public class BankAccount {
 	@NotNull
 	@Column(name = BankAccountConstants.FINANCIAL_PORTFOLIO_ID)
 	@JsonProperty(access = Access.WRITE_ONLY)
+	@Size(max = 60)
 	private String financialPortfolioId;
 
 	@NotNull
