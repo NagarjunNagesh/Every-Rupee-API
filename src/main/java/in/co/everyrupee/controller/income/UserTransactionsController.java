@@ -130,4 +130,19 @@ public class UserTransactionsController {
 		return userTransactionSaved;
 	}
 
+	/**
+	 * Delete all  User Transactions
+	 * 
+	 * @param pFinancialPortfolioId
+	 * @return
+	 */
+	@RequestMapping(value = "/{pFinancialPortfolioId}", method = RequestMethod.DELETE)
+	public GenericResponse deleteAllUserTransactions(
+			@PathVariable @Size(min = 0, max = GenericConstants.MAX_ALLOWED_LENGTH_FINANCIAL_PORTFOLIO) String pFinancialPortfolioId) {
+
+		userTransactionService.deleteUserTransactions(pFinancialPortfolioId);
+
+		return new GenericResponse("success");
+	}
+
 }

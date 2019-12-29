@@ -138,4 +138,9 @@ public class BankAccountService implements IBankAccountService {
 		return categorizeBankAccount;
 	}
 
+	@Override
+	public void deleteAllBankAccounts(String pFinancialPortfolioId) {
+		// TODO
+	}
+
 }

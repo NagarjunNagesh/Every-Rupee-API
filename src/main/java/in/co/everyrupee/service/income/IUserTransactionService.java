@@ -29,4 +29,6 @@ public interface IUserTransactionService {
 
 	Double fetchUserTransactionCategoryTotal(String financialPortfolioId, Integer categoryId, Date dateMeantFor);
 
+	void deleteUserTransactions(String pFinancialPortfolioId);
+
 }
