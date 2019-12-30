@@ -283,7 +283,7 @@ public class UserBudgetServiceTest {
 
 		getUserBudgetService().fetchAllDatesWithUserBudget(FINANCIAL_PORTFOLIO_ID);
 
-		verify(getUserBudgetRepository(), times(1)).findAllDatesWithDateById(FINANCIAL_PORTFOLIO_ID);
+		verify(getUserBudgetRepository(), times(1)).findAllDatesByFPId(FINANCIAL_PORTFOLIO_ID);
 
 	}
 

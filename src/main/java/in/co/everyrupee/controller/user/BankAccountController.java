@@ -95,7 +95,7 @@ public class BankAccountController {
 	}
 
 	/**
-	 * Categorize the bank account
+	 * Delete all bank accounts
 	 * 
 	 * @return
 	 */

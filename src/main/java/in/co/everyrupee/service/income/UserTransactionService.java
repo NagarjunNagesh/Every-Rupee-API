@@ -26,7 +26,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.MultiValueMap;
-import org.springframework.http.MediaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -421,8 +420,20 @@ public class UserTransactionService implements IUserTransactionService {
 	 */
 	@Override
 	public void deleteUserTransactions(String pFinancialPortfolioId) {
-		userTransactionsRepository.deleteAllUserTransactions(pFinancialPortfolioId);
+		List<Date> dateMeantForList = userTransactionsRepository.findAllDatesByFPId(pFinancialPortfolioId);
+		dateMeantForList.stream().forEach(x -> deleteUserBudgets(pFinancialPortfolioId, x));
 
+	}
+
+	/**
+	 * Evict Cache and delete all user budget
+	 * 
+	 * @param financialPortfolioId
+	 * @param dateMeantFor
+	 */
+	@CacheEvict(key = "{#financialPortfolioId, #dateMeantFor")
+	private void deleteUserBudgets(String financialPortfolioId, Date dateMeantFor) {
+		userTransactionsRepository.deleteAllUserTransactions(financialPortfolioId, dateMeantFor);
 	}
 
 }

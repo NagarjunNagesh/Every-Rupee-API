@@ -477,7 +477,7 @@ public class UserBudgetService implements IUserBudgetService {
 	@Override
 	public Set<Integer> fetchAllDatesWithUserBudget(String financialPortfolioId) {
 
-		List<Date> dateMeantFor = getUserBudgetRepository().findAllDatesWithDateById(financialPortfolioId);
+		List<Date> dateMeantFor = getUserBudgetRepository().findAllDatesByFPId(financialPortfolioId);
 		Set<Date> setOfDateMeantFor = new HashSet<Date>(dateMeantFor);
 		Set<Integer> setOfDatesAsInteger = new HashSet<Integer>();
 
@@ -542,7 +542,19 @@ public class UserBudgetService implements IUserBudgetService {
 	 */
 	@Override
 	public void deleteAllUserBudgets(String financialPortfolioId) {
-		getUserBudgetRepository().deleteAllUserBudgets(financialPortfolioId);
+		List<Date> dateMeantForList = getUserBudgetRepository().findAllDatesByFPId(financialPortfolioId);
+		dateMeantForList.stream().forEach(x -> deleteUserBudgets(financialPortfolioId, x));
+	}
+
+	/**
+	 * Evict Cache and delete all user budget
+	 * 
+	 * @param financialPortfolioId
+	 * @param dateMeantFor
+	 */
+	@CacheEvict(key = "{#financialPortfolioId, #dateMeantFor")
+	private void deleteUserBudgets(String financialPortfolioId, Date dateMeantFor) {
+		getUserBudgetRepository().deleteAllUserBudget(financialPortfolioId, dateMeantFor);
 	}
 
 	public UserBudgetRepository getUserBudgetRepository() {

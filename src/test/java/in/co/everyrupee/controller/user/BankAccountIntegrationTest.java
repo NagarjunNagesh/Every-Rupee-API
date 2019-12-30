@@ -213,6 +213,8 @@ public class BankAccountIntegrationTest {
 				.param(DashboardConstants.Overview.FINANCIAL_PORTFOLIO_ID, FINANCIAL_PORTFOLIO_ID.toString()))
 				.andExpect(status().isOk()).andExpect(jsonPath("$").isNotEmpty());
 
+		verify(getBankAccountRepository(), times(1)).deleteAllBankAccounts(Mockito.anyString());
+
 	}
 
 	private WebApplicationContext getContext() {
