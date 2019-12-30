@@ -7,6 +7,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -197,6 +198,22 @@ public class BankAccountIntegrationTest {
 		getMvc().perform(get("/api/bankaccount/categorize").contentType(MediaType.APPLICATION_JSON)
 				.param(DashboardConstants.Overview.FINANCIAL_PORTFOLIO_ID, FINANCIAL_PORTFOLIO_ID.toString()))
 				.andExpect(status().isOk()).andExpect(jsonPath("$").isNotEmpty());
+
+	}
+
+	/**
+	 * TEST: delete all bank accounts
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	@WithMockUser(value = "spring")
+	public void deleteBankAccounts() throws Exception {
+		getMvc().perform(delete("/api/bankaccount/").contentType(MediaType.APPLICATION_JSON)
+				.param(DashboardConstants.Overview.FINANCIAL_PORTFOLIO_ID, FINANCIAL_PORTFOLIO_ID.toString()))
+				.andExpect(status().isOk()).andExpect(jsonPath("$").isNotEmpty());
+
+		verify(getBankAccountRepository(), times(1)).deleteAllBankAccounts(Mockito.anyString());
 
 	}
 

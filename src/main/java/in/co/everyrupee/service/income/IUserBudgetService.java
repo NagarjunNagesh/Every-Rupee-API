@@ -36,4 +36,6 @@ public interface IUserBudgetService {
 
 	UserBudget changeCategoryWithUserBudget(String financialPortfolioId, MultiValueMap<String, String> formData);
 
+	void deleteAllUserBudgets(String financialPortfolioId);
+
 }

@@ -280,6 +280,27 @@ public class UserTransactionIntegrationTest {
 
 	}
 
+	/**
+	 * TEST: Delete user Transactions by financial portfolio Id
+	 * 
+	 * @throws Exception
+	 */
+	@WithMockUser(value = "spring")
+	@Test
+	public void deleteUserTransactions() throws Exception {
+		getMvc().perform(delete("/api/transactions/193000000").accept(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk()).andExpect(jsonPath("$").isNotEmpty());
+
+		List<Date> dateEx = new ArrayList<Date>();
+		dateEx.add(dateMeantFor);
+		when(getUserTransactionRepository().findAllDatesByFPId(FINANCIAL_PORTFOLIO_ID)).thenReturn(dateEx);
+
+		verify(getUserTransactionRepository(), times(1)).findAllDatesByFPId(FINANCIAL_PORTFOLIO_ID);
+		// verify(getUserTransactionRepository(),
+		// times(1)).deleteAllUserTransactions(Mockito.anyString(),
+		// Mockito.any(Date.class));
+	}
+
 	private MockMvc getMvc() {
 		return mvc;
 	}

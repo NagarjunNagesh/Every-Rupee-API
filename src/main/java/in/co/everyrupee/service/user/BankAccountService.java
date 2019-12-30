@@ -138,4 +138,10 @@ public class BankAccountService implements IBankAccountService {
 		return categorizeBankAccount;
 	}
 
+	@Override
+	@CacheEvict(key = "#pFinancialPortfolioId")
+	public void deleteAllBankAccounts(String pFinancialPortfolioId) {
+		bankAccountRepository.deleteAllBankAccounts(pFinancialPortfolioId);
+	}
+
 }

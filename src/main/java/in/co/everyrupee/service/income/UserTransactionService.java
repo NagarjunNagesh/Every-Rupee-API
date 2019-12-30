@@ -18,8 +18,6 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
@@ -28,6 +26,8 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.MultiValueMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import in.co.everyrupee.constants.GenericConstants;
 import in.co.everyrupee.constants.income.DashboardConstants;
@@ -411,6 +411,29 @@ public class UserTransactionService implements IUserTransactionService {
 		} else {
 			return (incomeTotal / dateMeantForSet.size());
 		}
+	}
+
+	/**
+	 * Delete All user transactions
+	 * 
+	 * @param pFinancialPortfolioId
+	 */
+	@Override
+	public void deleteUserTransactions(String pFinancialPortfolioId) {
+		List<Date> dateMeantForList = userTransactionsRepository.findAllDatesByFPId(pFinancialPortfolioId);
+		dateMeantForList.stream().forEach(x -> deleteUserBudgets(pFinancialPortfolioId, x));
+
+	}
+
+	/**
+	 * Evict Cache and delete all user budget
+	 * 
+	 * @param financialPortfolioId
+	 * @param dateMeantFor
+	 */
+	@CacheEvict(key = "{#financialPortfolioId, #dateMeantFor")
+	private void deleteUserBudgets(String financialPortfolioId, Date dateMeantFor) {
+		userTransactionsRepository.deleteAllUserTransactions(financialPortfolioId, dateMeantFor);
 	}
 
 }

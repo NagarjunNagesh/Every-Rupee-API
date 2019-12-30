@@ -5,9 +5,8 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.validation.constraints.Size;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.MultiValueMap;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -93,6 +92,19 @@ public class BankAccountController {
 	public Map<String, Set<BankAccount>> categorizeBankAccount(
 			@RequestParam(DashboardConstants.Overview.FINANCIAL_PORTFOLIO_ID) @Size(min = 0, max = GenericConstants.MAX_ALLOWED_LENGTH_FINANCIAL_PORTFOLIO) String pFinancialPortfolioId) {
 		return getBankAccountService().categorizeBankAccount(pFinancialPortfolioId);
+	}
+
+	/**
+	 * Delete all bank accounts
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/", method = RequestMethod.DELETE)
+	public GenericResponse deleteAllBankAccounts(
+			@RequestParam(DashboardConstants.Overview.FINANCIAL_PORTFOLIO_ID) @Size(min = 0, max = GenericConstants.MAX_ALLOWED_LENGTH_FINANCIAL_PORTFOLIO) String pFinancialPortfolioId) {
+		getBankAccountService().deleteAllBankAccounts(pFinancialPortfolioId);
+
+		return new GenericResponse("success");
 	}
 
 	public IBankAccountService getBankAccountService() {

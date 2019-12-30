@@ -49,4 +49,12 @@ public interface IBankAccountService {
 	 * @return
 	 */
 	public Map<String, Set<BankAccount>> categorizeBankAccount(String pFinancialPortfolioId);
+
+	/**
+	 * Delete All Bank Accounts
+	 * 
+	 * @param pFinancialPortfolioId
+	 * @return
+	 */
+	public void deleteAllBankAccounts(String pFinancialPortfolioId);
 }
