@@ -428,6 +428,19 @@ public class UserBudgetIntegrationTest {
 
 	}
 
+	/**
+	 * TEST: Delete user Budget by financial portfolio Id
+	 * 
+	 * @throws Exception
+	 */
+	@WithMockUser(value = "spring")
+	@Test
+	public void deleteUserBudget() throws Exception {
+		getMvc().perform(delete("/api/budget/")
+				.param(DashboardConstants.Overview.FINANCIAL_PORTFOLIO_ID, FINANCIAL_PORTFOLIO_ID.toString())
+				.accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andExpect(jsonPath("$").isNotEmpty());
+	}
+
 	private UserBudgetRepository getUserBudgetRepository() {
 		return userBudgetRepository;
 	}

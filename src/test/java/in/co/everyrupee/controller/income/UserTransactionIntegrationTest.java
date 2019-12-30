@@ -280,6 +280,18 @@ public class UserTransactionIntegrationTest {
 
 	}
 
+	/**
+	 * TEST: Delete user Transactions by financial portfolio Id
+	 * 
+	 * @throws Exception
+	 */
+	@WithMockUser(value = "spring")
+	@Test
+	public void deleteUserTransactions() throws Exception {
+		getMvc().perform(delete("/api/transactions/193000000").accept(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk()).andExpect(jsonPath("$").isNotEmpty());
+	}
+
 	private MockMvc getMvc() {
 		return mvc;
 	}

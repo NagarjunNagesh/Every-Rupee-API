@@ -140,7 +140,7 @@ public class BankAccountService implements IBankAccountService {
 
 	@Override
 	public void deleteAllBankAccounts(String pFinancialPortfolioId) {
-		// TODO
+		bankAccountRepository.deleteAllBankAccounts(pFinancialPortfolioId);
 	}
 
 }

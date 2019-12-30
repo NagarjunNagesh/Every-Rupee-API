@@ -1,12 +1,11 @@
 package in.co.everyrupee.controller.user;
 
-import java.awt.PageAttributes.MediaType;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import javax.validation.constraints.Size;
-
+import org.springframework.http.MediaType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.MultiValueMap;
 import org.springframework.validation.annotation.Validated;
