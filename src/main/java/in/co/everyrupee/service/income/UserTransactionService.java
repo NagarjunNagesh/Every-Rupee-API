@@ -431,7 +431,7 @@ public class UserTransactionService implements IUserTransactionService {
 	 * @param financialPortfolioId
 	 * @param dateMeantFor
 	 */
-	@CacheEvict(key = "{#financialPortfolioId, #dateMeantFor")
+	@CacheEvict(key = "{#financialPortfolioId, #dateMeantFor.toString()")
 	private void deleteUserBudgets(String financialPortfolioId, Date dateMeantFor) {
 		userTransactionsRepository.deleteAllUserTransactions(financialPortfolioId, dateMeantFor);
 	}

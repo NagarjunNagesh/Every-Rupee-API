@@ -552,7 +552,7 @@ public class UserBudgetService implements IUserBudgetService {
 	 * @param financialPortfolioId
 	 * @param dateMeantFor
 	 */
-	@CacheEvict(key = "{#financialPortfolioId, #dateMeantFor")
+	@CacheEvict(key = "{#financialPortfolioId, #dateMeantFor.toString()")
 	private void deleteUserBudgets(String financialPortfolioId, Date dateMeantFor) {
 		getUserBudgetRepository().deleteAllUserBudget(financialPortfolioId, dateMeantFor);
 	}
