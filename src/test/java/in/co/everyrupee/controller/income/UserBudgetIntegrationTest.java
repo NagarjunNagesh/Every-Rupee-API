@@ -25,6 +25,7 @@ import java.util.Locale;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -440,13 +441,7 @@ public class UserBudgetIntegrationTest {
 				.param(DashboardConstants.Overview.FINANCIAL_PORTFOLIO_ID, FINANCIAL_PORTFOLIO_ID.toString())
 				.accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andExpect(jsonPath("$").isNotEmpty());
 
-		List<Date> dateEx = new ArrayList<Date>();
-		dateEx.add(dateMeantFor);
-		when(getUserBudgetRepository().findAllDatesByFPId(FINANCIAL_PORTFOLIO_ID)).thenReturn(dateEx);
-
-		verify(getUserBudgetRepository(), times(1)).findAllDatesByFPId(FINANCIAL_PORTFOLIO_ID);
-		// verify(getUserBudgetRepository(),
-		// times(1)).deleteAllUserBudget(Mockito.anyString(), Mockito.any(Date.class));
+		verify(getUserBudgetRepository(), times(1)).deleteAllUserBudgets(Mockito.anyString());
 	}
 
 	private UserBudgetRepository getUserBudgetRepository() {
