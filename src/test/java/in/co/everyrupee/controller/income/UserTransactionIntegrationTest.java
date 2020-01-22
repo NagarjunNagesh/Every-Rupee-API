@@ -45,7 +45,9 @@ import org.springframework.web.context.WebApplicationContext;
 
 import in.co.everyrupee.constants.income.DashboardConstants;
 import in.co.everyrupee.pojo.income.UserTransaction;
+import in.co.everyrupee.pojo.user.BankAccount;
 import in.co.everyrupee.repository.income.UserTransactionsRepository;
+import in.co.everyrupee.repository.user.BankAccountRepository;
 
 /**
  * User Transaction Test (Cache, Controller. Service)
@@ -64,6 +66,9 @@ public class UserTransactionIntegrationTest {
 
 	@MockBean
 	private UserTransactionsRepository userTransactionRepository;
+
+	@MockBean
+	private BankAccountRepository bankAccountRepository;
 
 	@MockBean
 	private ApplicationEventPublisher eventPublisher;
@@ -102,6 +107,11 @@ public class UserTransactionIntegrationTest {
 		userTransaction.setFinancialPortfolioId(FINANCIAL_PORTFOLIO_ID);
 		userTransaction.setCategoryId(3);
 		userTransaction.setAmount(300);
+
+		// Bank Acount integration test
+		BankAccount newAccount = new BankAccount();
+		newAccount.setId(123);
+		Mockito.when(getBankAccountRepository().save(Mockito.any(BankAccount.class))).thenReturn(newAccount);
 
 		// Appends the above created user Transactions to the list
 		getUserTransactionsList().add(userTransaction);
@@ -334,8 +344,11 @@ public class UserTransactionIntegrationTest {
 		this.userTransactionsList = userTransactionsList;
 	}
 
-	public ApplicationEventPublisher getEventPublisher() {
+	private ApplicationEventPublisher getEventPublisher() {
 		return eventPublisher;
 	}
 
+	private BankAccountRepository getBankAccountRepository() {
+		return bankAccountRepository;
+	}
 }

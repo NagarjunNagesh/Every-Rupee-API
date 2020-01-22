@@ -25,86 +25,86 @@ import in.co.everyrupee.repository.income.CategoryRepository;
 @RunWith(SpringRunner.class)
 public class CategoryServiceTest {
 
-    @Autowired
-    private CategoryService categoryService;
+	@Autowired
+	private CategoryService categoryService;
 
-    @MockBean
-    private CategoryRepository categoryRepository;
+	@MockBean
+	private CategoryRepository categoryRepository;
 
-    Logger logger = LoggerFactory.getLogger(this.getClass());
+	Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private List<Category> categoryList;
+	private List<Category> categoryList;
 
-    @TestConfiguration
-    static class UserBudgetServiceImplTestContextConfiguration {
+	@TestConfiguration
+	static class CategoryServiceImplTestContextConfiguration {
 
-	@Bean
-	public CategoryService categoryService() {
-	    return new CategoryService();
+		@Bean
+		public CategoryService categoryService() {
+			return new CategoryService();
+		}
+
 	}
 
-    }
+	@Before
+	public void setUp() {
+		Category category = new Category();
+		category.setCategoryId(3);
+		category.setCategoryName("Beauty");
+		category.setParentCategory("2");
 
-    @Before
-    public void setUp() {
-	Category category = new Category();
-	category.setCategoryId(3);
-	category.setCategoryName("Beauty");
-	category.setParentCategory("2");
+		setCategoryList(new ArrayList<Category>());
+		getCategoryList().add(category);
+	}
 
-	setCategoryList(new ArrayList<Category>());
-	getCategoryList().add(category);
-    }
+	/**
+	 * TEST: Fetch All categories
+	 */
+	@Test
+	public void fetchCategories() {
+		// Fetch all categories
+		Mockito.when(getCategoryRepository().fetchAllCategories()).thenReturn(getCategoryList());
 
-    /**
-     * TEST: Fetch All categories
-     */
-    @Test
-    public void fetchCategories() {
-	// Fetch all categories
-	Mockito.when(getCategoryRepository().fetchAllCategories()).thenReturn(getCategoryList());
+		List<Category> categoryList = getCategoryService().fetchCategories();
 
-	List<Category> categoryList = getCategoryService().fetchCategories();
+		assertThat(categoryList).isNotEmpty();
 
-	assertThat(categoryList).isNotEmpty();
+	}
 
-    }
+	/**
+	 * TEST: Fetch all categories (EXCEPTION)
+	 */
+	@Test(expected = ResourceNotFoundException.class)
+	public void fetchCategoriesException() {
+		getCategoryService().fetchCategories();
+	}
 
-    /**
-     * TEST: Fetch all categories (EXCEPTION)
-     */
-    @Test(expected = ResourceNotFoundException.class)
-    public void fetchCategoriesException() {
-	getCategoryService().fetchCategories();
-    }
+	/**
+	 * TEST: Fetch All categories
+	 */
+	@Test
+	public void categoryIncome() {
+		// Fetch all categories
+		Mockito.when(getCategoryRepository().fetchAllCategories()).thenReturn(getCategoryList());
 
-    /**
-     * TEST: Fetch All categories
-     */
-    @Test
-    public void categoryIncome() {
-	// Fetch all categories
-	Mockito.when(getCategoryRepository().fetchAllCategories()).thenReturn(getCategoryList());
+		Boolean categoryPresent = getCategoryService().categoryIncome(3);
 
-	Boolean categoryPresent = getCategoryService().categoryIncome(3);
+		assertTrue(categoryPresent);
+	}
 
-	assertTrue(categoryPresent);
-    }
+	private CategoryRepository getCategoryRepository() {
+		return categoryRepository;
+	}
 
-    private CategoryRepository getCategoryRepository() {
-	return categoryRepository;
-    }
+	private CategoryService getCategoryService() {
+		return categoryService;
+	}
 
-    private CategoryService getCategoryService() {
-	return categoryService;
-    }
+	private List<Category> getCategoryList() {
+		return categoryList;
+	}
 
-    private List<Category> getCategoryList() {
-	return categoryList;
-    }
-
-    private void setCategoryList(List<Category> categoryList) {
-	this.categoryList = categoryList;
-    }
+	private void setCategoryList(List<Category> categoryList) {
+		this.categoryList = categoryList;
+	}
 
 }

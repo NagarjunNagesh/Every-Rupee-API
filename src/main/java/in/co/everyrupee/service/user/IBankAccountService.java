@@ -57,4 +57,12 @@ public interface IBankAccountService {
 	 * @return
 	 */
 	public void deleteAllBankAccounts(String pFinancialPortfolioId);
+
+	/**
+	 * Fetch the selected Account
+	 * 
+	 * @param pFinancialPortfolioId
+	 * @return
+	 */
+	public BankAccount fetchSelectedAccount(String pFinancialPortfolioId);
 }

@@ -144,4 +144,27 @@ public class BankAccountService implements IBankAccountService {
 		bankAccountRepository.deleteAllBankAccounts(pFinancialPortfolioId);
 	}
 
+	@Override
+	public BankAccount fetchSelectedAccount(String pFinancialPortfolioId) {
+		BankAccount bankAccount = new BankAccount();
+		List<BankAccount> bankAccountList = bankAccountRepository
+				.findSelectedAccountsByFinancialPortfolioId(pFinancialPortfolioId);
+
+		if (CollectionUtils.isNotEmpty(bankAccountList)) {
+			bankAccount = bankAccountList.get(0);
+		} else {
+			// Create a cash account and
+			BankAccount newAccount = new BankAccount();
+			newAccount.setLinked(false);
+			newAccount.setSelectedAccount(true);
+			newAccount.setFinancialPortfolioId(pFinancialPortfolioId);
+			newAccount.setBankAccountName(AccountType.CASH.toString());
+			newAccount.setAccountBalance(0d);
+			newAccount.setAccountType(AccountType.CASH);
+			bankAccount = bankAccountRepository.save(newAccount);
+		}
+
+		return bankAccount;
+	}
+
 }

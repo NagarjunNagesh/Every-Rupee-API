@@ -40,6 +40,7 @@ import in.co.everyrupee.pojo.TransactionType;
 import in.co.everyrupee.pojo.income.Category;
 import in.co.everyrupee.pojo.income.UserTransaction;
 import in.co.everyrupee.repository.income.UserTransactionsRepository;
+import in.co.everyrupee.service.user.BankAccountService;
 import in.co.everyrupee.utils.ERStringUtils;
 import in.co.everyrupee.utils.GenericUtils;
 
@@ -56,6 +57,9 @@ public class UserTransactionService implements IUserTransactionService {
 
 	@Autowired
 	private CategoryService categoryService;
+
+	@Autowired
+	private BankAccountService bankAccountService;
 
 	Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
@@ -145,6 +149,9 @@ public class UserTransactionService implements IUserTransactionService {
 		} catch (ParseException e) {
 			LOGGER.error(e + " Unable to add date to the user budget");
 		}
+
+		// Set the account ID as the selected bank account ID
+		userTransaction.setAccountId(bankAccountService.fetchSelectedAccount(pFinancialPortfolioId).getId());
 
 		UserTransaction userTransactionResponse = userTransactionsRepository.save(userTransaction);
 

@@ -36,7 +36,9 @@ import in.co.everyrupee.constants.income.DashboardConstants;
 import in.co.everyrupee.exception.ResourceNotFoundException;
 import in.co.everyrupee.pojo.TransactionType;
 import in.co.everyrupee.pojo.income.UserTransaction;
+import in.co.everyrupee.pojo.user.BankAccount;
 import in.co.everyrupee.repository.income.UserTransactionsRepository;
+import in.co.everyrupee.service.user.BankAccountService;
 import in.co.everyrupee.utils.ERStringUtils;
 
 @RunWith(SpringRunner.class)
@@ -51,6 +53,9 @@ public class UserTransactionServiceTest {
 
 	@MockBean
 	private CategoryService categoryService;
+
+	@MockBean
+	private BankAccountService bankAccountService;
 
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -94,6 +99,10 @@ public class UserTransactionServiceTest {
 			userTransactionSaved.setCategoryId(3);
 			userTransactionSaved.setAmount(600);
 			Mockito.when(getUserTransactionsRepository().save(Mockito.any())).thenReturn(userTransactionSaved);
+
+			BankAccount newAccount = new BankAccount();
+			newAccount.setId(123);
+			Mockito.when(getBankAccountService().fetchSelectedAccount(Mockito.anyString())).thenReturn(newAccount);
 
 			Optional<UserTransaction> userBudgetReturnValue = userTransactionList.stream().findFirst();
 			when(userTransactionsRepository.findById(3)).thenReturn(userBudgetReturnValue);
@@ -170,6 +179,7 @@ public class UserTransactionServiceTest {
 		UserTransaction userTransactionsSaved = getUserTransactionService().saveUserTransaction(formData,
 				FINANCIAL_PORTFOLIO_ID);
 		assertThat(userTransactionsSaved).isNotNull();
+		assertThat(userTransactionsSaved.getAccountId()).isNotNull();
 	}
 
 	/**
@@ -248,12 +258,20 @@ public class UserTransactionServiceTest {
 		return userTransactionsRepository;
 	}
 
-	public CategoryService getCategoryService() {
+	private CategoryService getCategoryService() {
 		return categoryService;
 	}
 
-	public void setCategoryService(CategoryService categoryService) {
+	private void setCategoryService(CategoryService categoryService) {
 		this.categoryService = categoryService;
+	}
+
+	public BankAccountService getBankAccountService() {
+		return bankAccountService;
+	}
+
+	public void setBankAccountService(BankAccountService bankAccountService) {
+		this.bankAccountService = bankAccountService;
 	}
 
 }
