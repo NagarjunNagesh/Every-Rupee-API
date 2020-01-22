@@ -3,6 +3,8 @@
  */
 package in.co.everyrupee.service.user;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -21,7 +23,7 @@ import in.co.everyrupee.pojo.income.UserBudget;
 import in.co.everyrupee.pojo.user.BankAccount;
 import in.co.everyrupee.repository.user.BankAccountRepository;
 import in.co.everyrupee.service.income.CategoryService;
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -61,6 +63,14 @@ public class BankAccountServiceTest {
 
 	}
 
+	@Before
+	public void setUp() {
+		BankAccount newAccount = new BankAccount();
+		newAccount.setFinancialPortfolioId(FINANCIAL_PORTFOLIO_ID);
+		newAccount.setSelectedAccount(true);
+		Mockito.when(bankAccountRepository.save(Mockito.any())).thenReturn(newAccount);
+	}
+
 	/**
 	 * TEST: to return user budget with fetchAllUserBudget
 	 */
@@ -68,9 +78,9 @@ public class BankAccountServiceTest {
 	public void userBudgetRetrieveMock() {
 		BankAccount newBankAccount = getBankAccountService().fetchSelectedAccount(FINANCIAL_PORTFOLIO_ID);
 
-		// assertThat(newBankAccount).isNotEmpty();
-		// assertThat(newBankAccount.getFinancialPortfolioId()).isEqualTo(FINANCIAL_PORTFOLIO_ID);
-		// assertThat(newBankAccount.isSelectedAccount()).isEqualTo(true);
+		assertThat(newBankAccount, is(notNullValue()));
+		assertThat(newBankAccount.getFinancialPortfolioId(), is(FINANCIAL_PORTFOLIO_ID));
+		assertThat(newBankAccount.isSelectedAccount(), is(true));
 	}
 
 	private BankAccountService getBankAccountService() {
