@@ -344,10 +344,6 @@ public class UserTransactionIntegrationTest {
 		this.userTransactionsList = userTransactionsList;
 	}
 
-	private ApplicationEventPublisher getEventPublisher() {
-		return eventPublisher;
-	}
-
 	private BankAccountRepository getBankAccountRepository() {
 		return bankAccountRepository;
 	}

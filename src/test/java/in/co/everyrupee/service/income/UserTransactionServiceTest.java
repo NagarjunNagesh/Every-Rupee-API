@@ -262,10 +262,6 @@ public class UserTransactionServiceTest {
 		return categoryService;
 	}
 
-	private void setCategoryService(CategoryService categoryService) {
-		this.categoryService = categoryService;
-	}
-
 	public BankAccountService getBankAccountService() {
 		return bankAccountService;
 	}
