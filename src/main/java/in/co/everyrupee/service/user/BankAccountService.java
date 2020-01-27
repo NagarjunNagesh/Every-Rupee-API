@@ -194,4 +194,14 @@ public class BankAccountService implements IBankAccountService {
 		return bankAccountRepository.findById(accountId);
 	}
 
+	@Override
+	public List<BankAccount> fetchAllBankAccount(Set<Integer> accountIds) {
+		return bankAccountRepository.findAllById(accountIds);
+	}
+
+	@Override
+	public void saveAll(List<BankAccount> bankAccountList) {
+		bankAccountRepository.saveAll(bankAccountList);
+	}
+
 }

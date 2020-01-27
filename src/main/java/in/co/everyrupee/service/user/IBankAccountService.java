@@ -82,4 +82,19 @@ public interface IBankAccountService {
 	 * @return
 	 */
 	public Optional<BankAccount> fetchBankAccountById(Integer accountId);
+
+	/**
+	 * Fetch All Bank account
+	 * 
+	 * @param accountIds
+	 * @return
+	 */
+	List<BankAccount> fetchAllBankAccount(Set<Integer> accountIds);
+
+	/**
+	 * Save All Bank Account
+	 * 
+	 * @param bankAccountList
+	 */
+	public void saveAll(List<BankAccount> bankAccountList);
 }
