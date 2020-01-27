@@ -217,14 +217,13 @@ public class UserTransactionService implements IUserTransactionService {
 		}
 
 		if (ERStringUtils.equalsIgnoreCase(formFieldName, DashboardConstants.Transactions.AMOUNT_FIELD_NAME)) {
-			double oldAmount = userTransaction.get().getAmount();
 			double newAmount = Double
 					.parseDouble(formData.get(DashboardConstants.Transactions.TRANSACTIONS_AMOUNT).get(0));
 			userTransaction.get().setAmount(newAmount);
 			// Auto update the bankaccount balance (The old Amount has to be removed from
 			// the bank account balance)
-			eventPublisher.publishEvent(new OnAffectBankAccountBalanceEvent(null, newAmount - oldAmount,
-					userTransaction.get().getAccountId()));
+			eventPublisher.publishEvent(new OnAffectBankAccountBalanceEvent(null,
+					newAmount - userTransaction.get().getAmount(), userTransaction.get().getAccountId()));
 		}
 
 		if (ERStringUtils.equalsIgnoreCase(formFieldName, DashboardConstants.Transactions.CATEGORY_FORM_FIELD_NAME)) {
