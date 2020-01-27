@@ -2,6 +2,7 @@ package in.co.everyrupee.service.user;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.util.MultiValueMap;
@@ -65,4 +66,20 @@ public interface IBankAccountService {
 	 * @return
 	 */
 	public BankAccount fetchSelectedAccount(String pFinancialPortfolioId);
+
+	/**
+	 * Update Bank account balance
+	 * 
+	 * @param bankAccount
+	 * @param amountModified
+	 */
+	public void updateBankBalance(BankAccount bankAccount, Double amountModified);
+
+	/**
+	 * Fetch Bank account by ID
+	 * 
+	 * @param accountId
+	 * @return
+	 */
+	public Optional<BankAccount> fetchBankAccountById(Integer accountId);
 }

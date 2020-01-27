@@ -12,10 +12,7 @@ import org.springframework.util.MultiValueMap;
  */
 public class OnSaveTransactionCompleteEvent extends ApplicationEvent {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 3357743646508528000L;
 	private final MultiValueMap<String, String> formData;
 	private final String financialPortfolioId;
 
