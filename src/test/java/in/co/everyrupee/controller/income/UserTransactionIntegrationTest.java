@@ -171,6 +171,10 @@ public class UserTransactionIntegrationTest {
 		assertThat(getCacheManager().getCache(DashboardConstants.Transactions.TRANSACTIONS_CACHE_NAME)
 				.get(getCacheObjectKey()), is(notNullValue()));
 
+		// Mock saving the user transaction
+		when(getUserTransactionRepository().save(Mockito.any(UserTransaction.class)))
+				.thenReturn(getUserTransactionsList().get(0));
+
 		getMvc().perform(
 				post("/api/transactions/save/193000000").param(DashboardConstants.Transactions.CATEGORY_OPTIONS, "3")
 						.param(DashboardConstants.Transactions.FINANCIAL_PORTFOLIO_ID, FINANCIAL_PORTFOLIO_ID)

@@ -9,22 +9,20 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -108,7 +106,7 @@ public class BankAccountServiceTest {
 	public void fetchAllBankAccount() {
 		Set<Integer> accountIds = new HashSet<Integer>();
 		bankAccountService.fetchAllBankAccount(accountIds);
-		verify(bankAccountRepository, times(1)).findAllById(Mockito.any(Set.class));
+		verify(bankAccountRepository, times(1)).findAllById(Mockito.any());
 	}
 
 	/**
