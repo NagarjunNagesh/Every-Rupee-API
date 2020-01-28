@@ -11,10 +11,6 @@ import org.apache.commons.collections4.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.event.TransactionPhase;
-import org.springframework.transaction.event.TransactionalEventListener;
 
 import in.co.everyrupee.events.user.OnDeleteUserTransactionCompleteEvent;
 import in.co.everyrupee.pojo.income.UserTransaction;
@@ -42,8 +38,6 @@ public class BankAccountBulkDeleteListener implements IBankAccountBulkDeleteList
 	 * Annotations defined below are required to not propogate the transactions and
 	 * to create a new transaction for the listener.
 	 */
-	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	@Override
 	public void onApplicationEvent(OnDeleteUserTransactionCompleteEvent event) {
 		this.bulkUpdateBankAccountBalance(event);

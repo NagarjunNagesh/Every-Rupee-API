@@ -25,6 +25,7 @@ import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.MultiValueMap;
@@ -159,6 +160,22 @@ public class UserTransactionService implements IUserTransactionService {
 
 		UserTransaction userTransactionResponse = userTransactionsRepository.save(userTransaction);
 
+		executeEventListenersForSaveAction(formData, pFinancialPortfolioId, bankAccount, userTransactionResponse);
+
+		return userTransactionResponse;
+	}
+
+	/**
+	 * Execute event listeners for save action
+	 * 
+	 * @param formData
+	 * @param pFinancialPortfolioId
+	 * @param bankAccount
+	 * @param userTransactionResponse
+	 */
+	@Async
+	private void executeEventListenersForSaveAction(MultiValueMap<String, String> formData,
+			String pFinancialPortfolioId, BankAccount bankAccount, UserTransaction userTransactionResponse) {
 		// Auto Create Budget on saving the transaction
 		boolean categoryIncome = categoryService.categoryIncome(userTransactionResponse.getCategoryId());
 		// Fetch the transaction amount to affect the bank account balance
@@ -172,8 +189,6 @@ public class UserTransactionService implements IUserTransactionService {
 
 		// Auto update the bankaccount balance
 		eventPublisher.publishEvent(new OnAffectBankAccountBalanceEvent(bankAccount, transactionAmount, null));
-
-		return userTransactionResponse;
 	}
 
 	/**
@@ -192,13 +207,23 @@ public class UserTransactionService implements IUserTransactionService {
 		List<Integer> transactionIdsAsIntegerList = transactionIdsAsSet.stream().filter(Objects::nonNull)
 				.map(s -> Integer.parseInt(s)).collect(Collectors.toList());
 
+		executeEventListenersForDeleteAction(transactionIdsAsIntegerList);
+
+		userTransactionsRepository.deleteUsersWithIds(transactionIdsAsIntegerList, financialPortfolioId);
+
+	}
+
+	/**
+	 * Execute Event Listeners for delete action
+	 * 
+	 * @param transactionIdsAsIntegerList
+	 */
+	@Async
+	private void executeEventListenersForDeleteAction(List<Integer> transactionIdsAsIntegerList) {
 		// Fetch all user transactions
 		List<UserTransaction> userTransList = userTransactionsRepository.findAllById(transactionIdsAsIntegerList);
 		// Auto update the bank account balance
 		eventPublisher.publishEvent(new OnDeleteUserTransactionCompleteEvent(userTransList));
-
-		userTransactionsRepository.deleteUsersWithIds(transactionIdsAsIntegerList, financialPortfolioId);
-
 	}
 
 	/**
