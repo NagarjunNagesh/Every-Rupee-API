@@ -8,6 +8,7 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
@@ -21,9 +22,8 @@ import in.co.everyrupee.service.user.IBankAccountService;
  * @author Nagarjun
  *
  */
-@Async
 @Component
-public class BankAccountBalanceUpdateListener implements IBankAccountBalanceUpdateListener {
+public class BankAccountBalanceUpdateListener {
 
 	@Autowired
 	private IBankAccountService bankAccountService;
@@ -31,16 +31,12 @@ public class BankAccountBalanceUpdateListener implements IBankAccountBalanceUpda
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	/**
-	 * Annotations defined below are required to not propogate the transactions and
-	 * to create a new transaction for the listener.
+	 * Update the bank balance
+	 * 
+	 * @param event
 	 */
-	@Override
-	public void onApplicationEvent(OnAffectBankAccountBalanceEvent event) {
-		this.updateBankAccountBalance(event);
-
-	}
-
-	@Override
+	@Async
+	@EventListener
 	public void updateBankAccountBalance(OnAffectBankAccountBalanceEvent event) {
 		BankAccount modifyBankAccount = event.getBankAccount();
 		if (modifyBankAccount == null) {

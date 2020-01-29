@@ -11,6 +11,9 @@ import org.apache.commons.collections4.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Component;
 
 import in.co.everyrupee.events.user.OnDeleteUserTransactionCompleteEvent;
 import in.co.everyrupee.pojo.income.UserTransaction;
@@ -24,7 +27,8 @@ import in.co.everyrupee.service.user.IBankAccountService;
  * @author Nagarjun
  *
  */
-public class BankAccountBulkDeleteListener implements IBankAccountBulkDeleteListener {
+@Component
+public class BankAccountBulkDeleteListener {
 
 	@Autowired
 	private IBankAccountService bankAccountService;
@@ -35,15 +39,10 @@ public class BankAccountBulkDeleteListener implements IBankAccountBulkDeleteList
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	/**
-	 * Annotations defined below are required to not propogate the transactions and
-	 * to create a new transaction for the listener.
+	 * Bulk Update Bank Balance
 	 */
-	@Override
-	public void onApplicationEvent(OnDeleteUserTransactionCompleteEvent event) {
-		this.bulkUpdateBankAccountBalance(event);
-	}
-
-	@Override
+	@Async
+	@EventListener
 	public void bulkUpdateBankAccountBalance(OnDeleteUserTransactionCompleteEvent event) {
 		Map<Integer, Double> bankAccountAndAmount = new HashedMap<Integer, Double>();
 		for (UserTransaction userTransaction : event.getUserTransactionList()) {

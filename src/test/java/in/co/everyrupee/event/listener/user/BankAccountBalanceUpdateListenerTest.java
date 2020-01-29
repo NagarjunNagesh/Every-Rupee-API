@@ -3,6 +3,8 @@
  */
 package in.co.everyrupee.event.listener.user;
 
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
@@ -53,6 +55,9 @@ public class BankAccountBalanceUpdateListenerTest {
 	@WithMockUser(value = "spring")
 	public void updateBankAccountBalance() {
 		eventPublisher.publishEvent(new OnAffectBankAccountBalanceEvent(null, 11d, ACCOUNT_ID));
+
+		// Check if ASYNC is invoked properly
+		verify(getBankAccountRepository(), times(0)).findById(ACCOUNT_ID);
 	}
 
 	private BankAccountRepository getBankAccountRepository() {
