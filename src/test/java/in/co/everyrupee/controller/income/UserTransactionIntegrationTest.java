@@ -45,7 +45,9 @@ import org.springframework.web.context.WebApplicationContext;
 
 import in.co.everyrupee.constants.income.DashboardConstants;
 import in.co.everyrupee.pojo.income.UserTransaction;
+import in.co.everyrupee.pojo.user.BankAccount;
 import in.co.everyrupee.repository.income.UserTransactionsRepository;
+import in.co.everyrupee.repository.user.BankAccountRepository;
 
 /**
  * User Transaction Test (Cache, Controller. Service)
@@ -64,6 +66,9 @@ public class UserTransactionIntegrationTest {
 
 	@MockBean
 	private UserTransactionsRepository userTransactionRepository;
+
+	@MockBean
+	private BankAccountRepository bankAccountRepository;
 
 	@MockBean
 	private ApplicationEventPublisher eventPublisher;
@@ -102,6 +107,11 @@ public class UserTransactionIntegrationTest {
 		userTransaction.setFinancialPortfolioId(FINANCIAL_PORTFOLIO_ID);
 		userTransaction.setCategoryId(3);
 		userTransaction.setAmount(300);
+
+		// Bank Acount integration test
+		BankAccount newAccount = new BankAccount();
+		newAccount.setId(123);
+		Mockito.when(getBankAccountRepository().save(Mockito.any(BankAccount.class))).thenReturn(newAccount);
 
 		// Appends the above created user Transactions to the list
 		getUserTransactionsList().add(userTransaction);
@@ -160,6 +170,10 @@ public class UserTransactionIntegrationTest {
 		// Ensuring that the cache contains the said values
 		assertThat(getCacheManager().getCache(DashboardConstants.Transactions.TRANSACTIONS_CACHE_NAME)
 				.get(getCacheObjectKey()), is(notNullValue()));
+
+		// Mock saving the user transaction
+		when(getUserTransactionRepository().save(Mockito.any(UserTransaction.class)))
+				.thenReturn(getUserTransactionsList().get(0));
 
 		getMvc().perform(
 				post("/api/transactions/save/193000000").param(DashboardConstants.Transactions.CATEGORY_OPTIONS, "3")
@@ -291,14 +305,7 @@ public class UserTransactionIntegrationTest {
 		getMvc().perform(delete("/api/transactions/193000000").accept(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk()).andExpect(jsonPath("$").isNotEmpty());
 
-		List<Date> dateEx = new ArrayList<Date>();
-		dateEx.add(dateMeantFor);
-		when(getUserTransactionRepository().findAllDatesByFPId(FINANCIAL_PORTFOLIO_ID)).thenReturn(dateEx);
-
-		verify(getUserTransactionRepository(), times(1)).findAllDatesByFPId(FINANCIAL_PORTFOLIO_ID);
-		// verify(getUserTransactionRepository(),
-		// times(1)).deleteAllUserTransactions(Mockito.anyString(),
-		// Mockito.any(Date.class));
+		verify(getUserTransactionRepository(), times(1)).deleteAllUserTransactions(Mockito.anyString());
 	}
 
 	private MockMvc getMvc() {
@@ -341,8 +348,7 @@ public class UserTransactionIntegrationTest {
 		this.userTransactionsList = userTransactionsList;
 	}
 
-	public ApplicationEventPublisher getEventPublisher() {
-		return eventPublisher;
+	private BankAccountRepository getBankAccountRepository() {
+		return bankAccountRepository;
 	}
-
 }

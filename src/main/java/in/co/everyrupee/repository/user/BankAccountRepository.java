@@ -37,4 +37,12 @@ public interface BankAccountRepository extends JpaRepository<BankAccount, Intege
 	@Query("delete from BankAccount u where u.financialPortfolioId in ?1")
 	void deleteAllBankAccounts(String financialPortfolioId);
 
+	/**
+	 * Fetch all selected bank accounts
+	 * 
+	 * @param financialPortfolioId
+	 * @return
+	 */
+	@Query("select u from BankAccount u where u.financialPortfolioId in ?1 and u.selectedAccount is true")
+	List<BankAccount> findSelectedAccountsByFinancialPortfolioId(String financialPortfolioId);
 }

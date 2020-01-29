@@ -18,28 +18,33 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.MultiValueMap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import in.co.everyrupee.constants.GenericConstants;
 import in.co.everyrupee.constants.income.DashboardConstants;
 import in.co.everyrupee.events.income.OnFetchCategoryTotalCompleteEvent;
 import in.co.everyrupee.events.income.OnSaveTransactionCompleteEvent;
+import in.co.everyrupee.events.user.OnAffectBankAccountBalanceEvent;
+import in.co.everyrupee.events.user.OnDeleteUserTransactionCompleteEvent;
 import in.co.everyrupee.exception.InvalidAttributeValueException;
 import in.co.everyrupee.exception.ResourceNotFoundException;
 import in.co.everyrupee.pojo.RecurrencePeriod;
 import in.co.everyrupee.pojo.TransactionType;
 import in.co.everyrupee.pojo.income.Category;
 import in.co.everyrupee.pojo.income.UserTransaction;
+import in.co.everyrupee.pojo.user.BankAccount;
 import in.co.everyrupee.repository.income.UserTransactionsRepository;
+import in.co.everyrupee.service.user.BankAccountService;
 import in.co.everyrupee.utils.ERStringUtils;
 import in.co.everyrupee.utils.GenericUtils;
 
@@ -56,6 +61,9 @@ public class UserTransactionService implements IUserTransactionService {
 
 	@Autowired
 	private CategoryService categoryService;
+
+	@Autowired
+	private BankAccountService bankAccountService;
 
 	Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
@@ -146,17 +154,41 @@ public class UserTransactionService implements IUserTransactionService {
 			LOGGER.error(e + " Unable to add date to the user budget");
 		}
 
+		// Set the account ID as the selected bank account ID
+		BankAccount bankAccount = bankAccountService.fetchSelectedAccount(pFinancialPortfolioId);
+		userTransaction.setAccountId(bankAccount.getId());
+
 		UserTransaction userTransactionResponse = userTransactionsRepository.save(userTransaction);
 
-		// Auto Create Budget on saving the transaction
-		String categoryId = formData.getFirst(DashboardConstants.Transactions.CATEGORY_OPTIONS);
-		boolean categoryIncome = ERStringUtils.isEmpty(categoryId) ? false
-				: categoryService.categoryIncome(Integer.parseInt(categoryId));
-		if (categoryIncome) {
-			eventPublisher.publishEvent(new OnSaveTransactionCompleteEvent(pFinancialPortfolioId, formData));
-		}
+		executeEventListenersForSaveAction(formData, pFinancialPortfolioId, bankAccount, userTransactionResponse);
 
 		return userTransactionResponse;
+	}
+
+	/**
+	 * Execute event listeners for save action
+	 * 
+	 * @param formData
+	 * @param pFinancialPortfolioId
+	 * @param bankAccount
+	 * @param userTransactionResponse
+	 */
+	@Async
+	private void executeEventListenersForSaveAction(MultiValueMap<String, String> formData,
+			String pFinancialPortfolioId, BankAccount bankAccount, UserTransaction userTransactionResponse) {
+		// Auto Create Budget on saving the transaction
+		boolean categoryIncome = categoryService.categoryIncome(userTransactionResponse.getCategoryId());
+		// Fetch the transaction amount to affect the bank account balance
+		double transactionAmount = userTransactionResponse.getAmount();
+		if (categoryIncome) {
+			eventPublisher.publishEvent(new OnSaveTransactionCompleteEvent(pFinancialPortfolioId, formData));
+		} else {
+			// If amount is negative then set amount modified to a negative value
+			transactionAmount *= -1;
+		}
+
+		// Auto update the bankaccount balance
+		eventPublisher.publishEvent(new OnAffectBankAccountBalanceEvent(bankAccount, transactionAmount, null));
 	}
 
 	/**
@@ -175,8 +207,23 @@ public class UserTransactionService implements IUserTransactionService {
 		List<Integer> transactionIdsAsIntegerList = transactionIdsAsSet.stream().filter(Objects::nonNull)
 				.map(s -> Integer.parseInt(s)).collect(Collectors.toList());
 
+		executeEventListenersForDeleteAction(transactionIdsAsIntegerList);
+
 		userTransactionsRepository.deleteUsersWithIds(transactionIdsAsIntegerList, financialPortfolioId);
 
+	}
+
+	/**
+	 * Execute Event Listeners for delete action
+	 * 
+	 * @param transactionIdsAsIntegerList
+	 */
+	@Async
+	private void executeEventListenersForDeleteAction(List<Integer> transactionIdsAsIntegerList) {
+		// Fetch all user transactions
+		List<UserTransaction> userTransList = userTransactionsRepository.findAllById(transactionIdsAsIntegerList);
+		// Auto update the bank account balance
+		eventPublisher.publishEvent(new OnDeleteUserTransactionCompleteEvent(userTransList));
 	}
 
 	/**
@@ -195,8 +242,13 @@ public class UserTransactionService implements IUserTransactionService {
 		}
 
 		if (ERStringUtils.equalsIgnoreCase(formFieldName, DashboardConstants.Transactions.AMOUNT_FIELD_NAME)) {
-			userTransaction.get().setAmount(
-					Double.parseDouble(formData.get(DashboardConstants.Transactions.TRANSACTIONS_AMOUNT).get(0)));
+			double newAmount = Double
+					.parseDouble(formData.get(DashboardConstants.Transactions.TRANSACTIONS_AMOUNT).get(0));
+			userTransaction.get().setAmount(newAmount);
+			// Auto update the bankaccount balance (The old Amount has to be removed from
+			// the bank account balance)
+			eventPublisher.publishEvent(new OnAffectBankAccountBalanceEvent(null,
+					newAmount - userTransaction.get().getAmount(), userTransaction.get().getAccountId()));
 		}
 
 		if (ERStringUtils.equalsIgnoreCase(formFieldName, DashboardConstants.Transactions.CATEGORY_FORM_FIELD_NAME)) {
@@ -382,7 +434,7 @@ public class UserTransactionService implements IUserTransactionService {
 		Map<Date, Double> dateAndAmountAsList = new HashMap<Date, Double>();
 
 		// Map of Date and Sum of all the transaction amounts and sorts by the
-		// datemeantfor (TREEMAP sorts the map by the key)
+		// date meant for (TREEMAP sorts the map by the key)
 		dateAndAmountAsList = lifetimeTransactions.stream().collect(Collectors.groupingBy(
 				UserTransaction::getDateMeantFor, TreeMap::new, Collectors.summingDouble(UserTransaction::getAmount)));
 
@@ -419,21 +471,10 @@ public class UserTransactionService implements IUserTransactionService {
 	 * @param pFinancialPortfolioId
 	 */
 	@Override
+	@CacheEvict(value = DashboardConstants.Transactions.TRANSACTIONS_CACHE_NAME, allEntries = true)
 	public void deleteUserTransactions(String pFinancialPortfolioId) {
-		List<Date> dateMeantForList = userTransactionsRepository.findAllDatesByFPId(pFinancialPortfolioId);
-		dateMeantForList.stream().forEach(x -> deleteUserBudgets(pFinancialPortfolioId, x));
+		userTransactionsRepository.deleteAllUserTransactions(pFinancialPortfolioId);
 
-	}
-
-	/**
-	 * Evict Cache and delete all user budget
-	 * 
-	 * @param financialPortfolioId
-	 * @param dateMeantFor
-	 */
-	@CacheEvict(key = "{#financialPortfolioId, #dateMeantFor")
-	private void deleteUserBudgets(String financialPortfolioId, Date dateMeantFor) {
-		userTransactionsRepository.deleteAllUserTransactions(financialPortfolioId, dateMeantFor);
 	}
 
 }

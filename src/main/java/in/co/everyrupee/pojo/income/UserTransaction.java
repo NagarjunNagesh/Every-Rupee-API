@@ -35,123 +35,134 @@ import in.co.everyrupee.pojo.RecurrencePeriod;
 @Table(name = DashboardConstants.Transactions.TRANSACTIONS_TABLE)
 public class UserTransaction implements Serializable {
 
-    private static final long serialVersionUID = 4387424250638939980L;
+	private static final long serialVersionUID = 4387424250638939980L;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = DashboardConstants.ID_SEQ)
-    @SequenceGenerator(name = DashboardConstants.ID_SEQ, sequenceName = DashboardConstants.ID_SEQ, allocationSize = 100)
-    @Column(name = DashboardConstants.Transactions.TRANSACTIONS_ID)
-    private int transactionId;
+	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = DashboardConstants.ID_SEQ)
+	@SequenceGenerator(name = DashboardConstants.ID_SEQ, sequenceName = DashboardConstants.ID_SEQ, allocationSize = 100)
+	@Column(name = DashboardConstants.Transactions.TRANSACTIONS_ID)
+	private int transactionId;
 
-    @Column(name = DashboardConstants.Transactions.DESCRIPTION)
-    private String description;
+	@Column(name = DashboardConstants.Transactions.DESCRIPTION)
+	private String description;
 
-    @Column(name = DashboardConstants.Category.CATEGORY_ID)
-    private int categoryId;
+	@Column(name = DashboardConstants.Category.CATEGORY_ID)
+	private int categoryId;
 
-    @NotNull
-    @Column(name = DashboardConstants.Transactions.FINANCIAL_PORTFOLIO_ID)
-    @Size(max = 60)
-    private String financialPortfolioId;
+	@NotNull
+	@Column(name = DashboardConstants.Transactions.FINANCIAL_PORTFOLIO_ID)
+	@Size(max = 60)
+	private String financialPortfolioId;
 
-    @NotNull
-    @Column(name = DashboardConstants.Transactions.AMOUNT)
-    @PositiveOrZero
-    private double amount;
+	@NotNull
+	@Column(name = DashboardConstants.Transactions.AMOUNT)
+	@PositiveOrZero
+	private double amount;
 
-    @NotNull
-    @Column(name = DashboardConstants.Budget.DATE_MEANT_FOR)
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date dateMeantFor;
+	@NotNull
+	@Column(name = DashboardConstants.Budget.DATE_MEANT_FOR)
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date dateMeantFor;
 
-    @CreationTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = DashboardConstants.CREATION_DATE)
-    private Date createDate;
+	@CreationTimestamp
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = DashboardConstants.CREATION_DATE)
+	private Date createDate;
 
-    @UpdateTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = DashboardConstants.MODIFICATION_DATE)
-    private Date modifyDate;
+	@UpdateTimestamp
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = DashboardConstants.MODIFICATION_DATE)
+	private Date modifyDate;
 
-    @NotNull
-    @Enumerated(EnumType.STRING)
-    @Column(name = DashboardConstants.Transactions.RECURRENCE, columnDefinition = DashboardConstants.RECURRENCE_COLUMN_DEFINITION)
-    private RecurrencePeriod recurrence;
+	@NotNull
+	@Enumerated(EnumType.STRING)
+	@Column(name = DashboardConstants.Transactions.RECURRENCE, columnDefinition = DashboardConstants.RECURRENCE_COLUMN_DEFINITION)
+	private RecurrencePeriod recurrence;
 
-    @PrePersist
-    protected void onCreate() {
-	if (getDateMeantFor() == null) {
-	    setDateMeantFor(new Date());
+	@NotNull
+	@Column(name = DashboardConstants.Transactions.ACCOUNT_ID)
+	private int accountId;
+
+	@PrePersist
+	protected void onCreate() {
+		if (getDateMeantFor() == null) {
+			setDateMeantFor(new Date());
+		}
+
+		if (getRecurrence() == null) {
+			setRecurrence(RecurrencePeriod.NEVER);
+		}
 	}
 
-	if (getRecurrence() == null) {
-	    setRecurrence(RecurrencePeriod.NEVER);
+	public int getTransactionId() {
+		return transactionId;
 	}
-    }
 
-    public int getTransactionId() {
-	return transactionId;
-    }
+	public void setTransactionId(int transactionId) {
+		this.transactionId = transactionId;
+	}
 
-    public void setTransactionId(int transactionId) {
-	this.transactionId = transactionId;
-    }
+	public String getDescription() {
+		return description;
+	}
 
-    public String getDescription() {
-	return description;
-    }
+	public void setDescription(String description) {
+		this.description = description;
+	}
 
-    public void setDescription(String description) {
-	this.description = description;
-    }
+	public int getCategoryId() {
+		return categoryId;
+	}
 
-    public int getCategoryId() {
-	return categoryId;
-    }
+	public void setCategoryId(int categoryId) {
+		this.categoryId = categoryId;
+	}
 
-    public void setCategoryId(int categoryId) {
-	this.categoryId = categoryId;
-    }
+	public double getAmount() {
+		return amount;
+	}
 
-    public double getAmount() {
-	return amount;
-    }
+	public void setAmount(double amount) {
+		this.amount = amount;
+	}
 
-    public void setAmount(double amount) {
-	this.amount = amount;
-    }
+	public String getFinancialPortfolioId() {
+		return financialPortfolioId;
+	}
 
-    public String getFinancialPortfolioId() {
-	return financialPortfolioId;
-    }
+	public void setFinancialPortfolioId(String financialPortfolioId) {
+		this.financialPortfolioId = financialPortfolioId;
+	}
 
-    public void setFinancialPortfolioId(String financialPortfolioId) {
-	this.financialPortfolioId = financialPortfolioId;
-    }
+	public Date getDateMeantFor() {
+		return dateMeantFor;
+	}
 
-    public Date getDateMeantFor() {
-	return dateMeantFor;
-    }
+	public void setDateMeantFor(Date dateMeantFor) {
+		this.dateMeantFor = dateMeantFor;
+	}
 
-    public void setDateMeantFor(Date dateMeantFor) {
-	this.dateMeantFor = dateMeantFor;
-    }
+	public RecurrencePeriod getRecurrence() {
+		return recurrence;
+	}
 
-    public RecurrencePeriod getRecurrence() {
-	return recurrence;
-    }
+	public void setRecurrence(RecurrencePeriod recurrence) {
+		this.recurrence = recurrence;
+	}
 
-    public void setRecurrence(RecurrencePeriod recurrence) {
-	this.recurrence = recurrence;
-    }
+	public Date getCreateDate() {
+		return createDate;
+	}
 
-    public Date getCreateDate() {
-	return createDate;
-    }
+	public void setCreateDate(Date createDate) {
+		this.createDate = createDate;
+	}
 
-    public void setCreateDate(Date createDate) {
-	this.createDate = createDate;
-    }
+	public int getAccountId() {
+		return accountId;
+	}
 
+	public void setAccountId(int accountId) {
+		this.accountId = accountId;
+	}
 }

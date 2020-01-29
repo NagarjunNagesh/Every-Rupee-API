@@ -6,9 +6,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
@@ -31,6 +34,8 @@ public class BankAccountService implements IBankAccountService {
 
 	@Autowired
 	private BankAccountRepository bankAccountRepository;
+
+	Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
 	@Override
 	@Cacheable(key = "#pFinancialPortfolioId")
@@ -142,6 +147,61 @@ public class BankAccountService implements IBankAccountService {
 	@CacheEvict(key = "#pFinancialPortfolioId")
 	public void deleteAllBankAccounts(String pFinancialPortfolioId) {
 		bankAccountRepository.deleteAllBankAccounts(pFinancialPortfolioId);
+	}
+
+	@Override
+	public BankAccount fetchSelectedAccount(String pFinancialPortfolioId) {
+		BankAccount bankAccount = new BankAccount();
+		List<BankAccount> bankAccountList = bankAccountRepository
+				.findSelectedAccountsByFinancialPortfolioId(pFinancialPortfolioId);
+
+		if (CollectionUtils.isNotEmpty(bankAccountList)) {
+			bankAccount = bankAccountList.get(0);
+		} else {
+			// Create a cash account and
+			BankAccount newAccount = new BankAccount();
+			newAccount.setLinked(false);
+			newAccount.setSelectedAccount(true);
+			newAccount.setFinancialPortfolioId(pFinancialPortfolioId);
+			newAccount.setBankAccountName(AccountType.CASH.toString());
+			newAccount.setAccountBalance(0d);
+			newAccount.setAccountType(AccountType.CASH);
+			bankAccount = bankAccountRepository.save(newAccount);
+		}
+
+		return bankAccount;
+	}
+
+	@Override
+	@CacheEvict(key = "#bankAccount.getFinancialPortfolioId()")
+	public void updateBankBalance(BankAccount bankAccount, Double amountModified) {
+
+		// If amountModified is null then return
+		if (amountModified == null || amountModified.isNaN() || amountModified.isInfinite() || bankAccount == null) {
+			LOGGER.warn(
+					"Unable to update the account balance as the amount modified is {0} and the bank account is {1}",
+					amountModified, bankAccount);
+			return;
+		}
+
+		// Update the new bank balance
+		bankAccount.setAccountBalance(bankAccount.getAccountBalance() + amountModified);
+		bankAccountRepository.save(bankAccount);
+	}
+
+	@Override
+	public Optional<BankAccount> fetchBankAccountById(Integer accountId) {
+		return bankAccountRepository.findById(accountId);
+	}
+
+	@Override
+	public List<BankAccount> fetchAllBankAccount(Set<Integer> accountIds) {
+		return bankAccountRepository.findAllById(accountIds);
+	}
+
+	@Override
+	public void saveAll(List<BankAccount> bankAccountList) {
+		bankAccountRepository.saveAll(bankAccountList);
 	}
 
 }
