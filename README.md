@@ -4,7 +4,7 @@ Use run it in the EC2
 sudo java -jar changeme.jar &
 
 Transfer the jar file to ec2
-scp -i pathreference/to/file.pem /path/to/file.jar user@awsenpoint:~
+sudo scp -i pathreference/to/file.pem /path/to/file.jar user@awsenpoint:~
 
 
 Kill Process in EC2
