@@ -132,18 +132,21 @@ public class UserTransactionService implements IUserTransactionService {
 		}
 
 		UserTransaction userTransaction = new UserTransaction();
+		// Set Financial portfolio ID
 		userTransaction.setFinancialPortfolioId(pFinancialPortfolioId);
+		// Set description
 		if (CollectionUtils.isNotEmpty(formData.get(DashboardConstants.Transactions.DESCRIPTION))) {
 			userTransaction.setDescription(formData.get(DashboardConstants.Transactions.DESCRIPTION).get(0));
 		}
-
+		// Set Recurrence
 		if (CollectionUtils.isNotEmpty(formData.get(DashboardConstants.Transactions.RECURRENCE))) {
 			userTransaction.setRecurrence(
 					RecurrencePeriod.valueOf(formData.get(DashboardConstants.Transactions.RECURRENCE).get(0)));
 		}
-
+		// Set Category ID
 		userTransaction
 				.setCategoryId(Integer.parseInt(formData.get(DashboardConstants.Transactions.CATEGORY_OPTIONS).get(0)));
+		// Set ID
 		userTransaction.setAmount(
 				Double.parseDouble(formData.get(DashboardConstants.Transactions.TRANSACTIONS_AMOUNT).get(0)));
 
@@ -183,7 +186,7 @@ public class UserTransactionService implements IUserTransactionService {
 		if (categoryIncome) {
 			eventPublisher.publishEvent(new OnSaveTransactionCompleteEvent(pFinancialPortfolioId, formData));
 		} else {
-			// If amount is negative then set amount modified to a negative value
+			// If amount is expense then set amount modified to a negative value
 			transactionAmount *= -1;
 		}
 
@@ -237,33 +240,90 @@ public class UserTransactionService implements IUserTransactionService {
 		Optional<UserTransaction> userTransaction = userTransactionsRepository
 				.findById(Integer.parseInt(formData.get(DashboardConstants.Transactions.TRANSACTIONS__ID_JSON).get(0)));
 
+		// Update Description
 		if (ERStringUtils.equalsIgnoreCase(formFieldName, DashboardConstants.Transactions.DESCRIPTION)) {
 			userTransaction.get().setDescription(formData.get(DashboardConstants.Transactions.DESCRIPTION).get(0));
 		}
 
+		// Update Amount
 		if (ERStringUtils.equalsIgnoreCase(formFieldName, DashboardConstants.Transactions.AMOUNT_FIELD_NAME)) {
 			double newAmount = Double
 					.parseDouble(formData.get(DashboardConstants.Transactions.TRANSACTIONS_AMOUNT).get(0));
+			updateAmountInAccount(userTransaction, newAmount);
 			userTransaction.get().setAmount(newAmount);
-			// Auto update the bankaccount balance (The old Amount has to be removed from
-			// the bank account balance)
-			eventPublisher.publishEvent(new OnAffectBankAccountBalanceEvent(null,
-					newAmount - userTransaction.get().getAmount(), userTransaction.get().getAccountId()));
 		}
 
+		// Update Category
 		if (ERStringUtils.equalsIgnoreCase(formFieldName, DashboardConstants.Transactions.CATEGORY_FORM_FIELD_NAME)) {
 			userTransaction.get().setCategoryId(
 					Integer.parseInt(formData.get(DashboardConstants.Transactions.CATEGORY_ID_JSON).get(0)));
 		}
 
+		// Update Recurrence
 		if (ERStringUtils.equalsIgnoreCase(formFieldName, DashboardConstants.Transactions.RECURRENCE)) {
 			userTransaction.get().setRecurrence(
 					RecurrencePeriod.valueOf(formData.get(DashboardConstants.Transactions.RECURRENCE).get(0)));
 		}
 
+		// Update Account ID
+		if (ERStringUtils.equalsIgnoreCase(formFieldName, DashboardConstants.Transactions.ACCOUNT_ID)) {
+			int newAccountId = Integer.parseInt(formData.get(DashboardConstants.Transactions.ACCOUNT_ID).get(0));
+			updateTransAmountForAccount(userTransaction, newAccountId);
+			userTransaction.get().setAccountId(newAccountId);
+		}
+
 		UserTransaction userTransactionSaved = userTransactionsRepository.save(userTransaction.get());
 
 		return userTransactionSaved;
+	}
+
+	/**
+	 * Remove transaction from old account
+	 * 
+	 * @param userTransaction
+	 */
+	@Async
+	private void updateTransAmountForAccount(Optional<UserTransaction> userTransaction, int newAccountId) {
+		double amountToModify = userTransaction.get().getAmount();
+		// Auto Create Budget on saving the transaction
+		boolean categoryIncome = categoryService.categoryIncome(userTransaction.get().getCategoryId());
+		// While removing from account have a negative effect
+		if (categoryIncome) {
+			amountToModify *= -1;
+		}
+		// Auto update the bankaccount balance (Old Account)
+		eventPublisher.publishEvent(
+				new OnAffectBankAccountBalanceEvent(null, amountToModify, userTransaction.get().getAccountId()));
+		// If category is income then reverse (-)
+		if (categoryIncome) {
+			amountToModify *= -1;
+		}
+		// Auto update the bankaccount balance (New Account)
+		eventPublisher.publishEvent(new OnAffectBankAccountBalanceEvent(null, amountToModify, newAccountId));
+	}
+
+	/**
+	 * Update amount in account (ASYNC)
+	 * 
+	 * @param userTransaction
+	 * @param newAmount
+	 * @return
+	 */
+	@Async
+	private void updateAmountInAccount(Optional<UserTransaction> userTransaction, double newAmount) {
+		double oldAmount = userTransaction.get().getAmount();
+		// Auto Create Budget on saving the transaction
+		boolean categoryIncome = categoryService.categoryIncome(userTransaction.get().getCategoryId());
+		if (categoryIncome) {
+			oldAmount *= -1;
+		} else {
+			newAmount *= -1;
+		}
+		double amountToModify = oldAmount + newAmount;
+		// Auto update the bankaccount balance (The old Amount has to be removed from
+		// the bank account balance)
+		eventPublisher.publishEvent(
+				new OnAffectBankAccountBalanceEvent(null, amountToModify, userTransaction.get().getAccountId()));
 	}
 
 	/**
