@@ -294,10 +294,9 @@ public class UserTransactionService implements IUserTransactionService {
 		// Auto update the bankaccount balance (Old Account)
 		eventPublisher.publishEvent(
 				new OnAffectBankAccountBalanceEvent(null, amountToModify, userTransaction.get().getAccountId()));
-		// If category is income then reverse (-)
-		if (categoryIncome) {
-			amountToModify *= -1;
-		}
+		// If category is income then reverse (-) or If category if expense then add (-)
+		amountToModify *= -1;
+		
 		// Auto update the bankaccount balance (New Account)
 		eventPublisher.publishEvent(new OnAffectBankAccountBalanceEvent(null, amountToModify, newAccountId));
 	}
