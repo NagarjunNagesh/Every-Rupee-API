@@ -190,6 +190,21 @@ public class BankAccountService implements IBankAccountService {
 	}
 
 	@Override
+	@CacheEvict(key = "#formData.getFirst(\"financialPortfolioId\")")
+	public BankAccount updateBankAccount(String bankAccountId, MultiValueMap<String, String> formData) {
+		Optional<BankAccount> bankAccount = bankAccountRepository.findById(Integer.parseInt(bankAccountId));
+
+		if (bankAccount.isPresent()) {
+			bankAccount.get().setAccountBalance(
+					Double.parseDouble(formData.getFirst(BankAccountConstants.ACCOUNT_BALANCE_PARAM)));
+			return bankAccountRepository.save(bankAccount.get());
+		}
+		LOGGER.warn("Bank account with Id {0} was not found for the financial portfolio id {1}", bankAccountId,
+				formData.getFirst("financialPortfolioId"));
+		return null;
+	}
+
+	@Override
 	public Optional<BankAccount> fetchBankAccountById(Integer accountId) {
 		return bankAccountRepository.findById(accountId);
 	}

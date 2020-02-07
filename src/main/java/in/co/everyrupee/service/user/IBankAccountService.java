@@ -97,4 +97,13 @@ public interface IBankAccountService {
 	 * @param bankAccountList
 	 */
 	public void saveAll(List<BankAccount> bankAccountList);
+
+	/**
+	 * Update Bank Account
+	 * 
+	 * @param bankAccountId
+	 * @param formData
+	 * @return
+	 */
+	public BankAccount updateBankAccount(String bankAccountId, MultiValueMap<String, String> formData);
 }

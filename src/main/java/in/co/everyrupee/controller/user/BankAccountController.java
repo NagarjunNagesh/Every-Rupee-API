@@ -5,10 +5,12 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.validation.constraints.Size;
-import org.springframework.http.MediaType;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.util.MultiValueMap;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -43,7 +45,18 @@ public class BankAccountController {
 	 */
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public List<BankAccount> getAllBankAccounts(
-			@RequestParam(DashboardConstants.Overview.FINANCIAL_PORTFOLIO_ID) @Size(min = 0, max = GenericConstants.MAX_ALLOWED_LENGTH_FINANCIAL_PORTFOLIO) String pFinancialPortfolioId) {
+			@RequestParam(DashboardConstants.BankAccount.FINANCIAL_PORTFOLIO_ID) @Size(min = 0, max = GenericConstants.MAX_ALLOWED_LENGTH_FINANCIAL_PORTFOLIO) String pFinancialPortfolioId) {
+		return getBankAccountService().getAllBankAccounts(pFinancialPortfolioId);
+	}
+
+	/**
+	 * Patch this Bank Accounts
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/{pBankAccountId}", method = RequestMethod.PATCH)
+	public List<BankAccount> patchThisBankAccounts(@RequestBody MultiValueMap<String, String> formData,
+			@PathVariable(DashboardConstants.BankAccount.BANK_ACCOUNT_ID) @Size(min = 0, max = GenericConstants.MAX_ALLOWED_LENGTH_FINANCIAL_PORTFOLIO) String pBankAccountId) {
 		return getBankAccountService().getAllBankAccounts(pFinancialPortfolioId);
 	}
 
@@ -59,13 +72,13 @@ public class BankAccountController {
 	}
 
 	/**
-	 * Get All User Budgets
+	 * Get the first 4 Bank Accounts
 	 * 
 	 * @return
 	 */
 	@RequestMapping(value = "/preview", method = RequestMethod.GET)
 	public List<BankAccount> previewBankAccounts(
-			@RequestParam(DashboardConstants.Overview.FINANCIAL_PORTFOLIO_ID) @Size(min = 0, max = GenericConstants.MAX_ALLOWED_LENGTH_FINANCIAL_PORTFOLIO) String pFinancialPortfolioId) {
+			@RequestParam(DashboardConstants.BankAccount.FINANCIAL_PORTFOLIO_ID) @Size(min = 0, max = GenericConstants.MAX_ALLOWED_LENGTH_FINANCIAL_PORTFOLIO) String pFinancialPortfolioId) {
 		return getBankAccountService().previewBankAccounts(pFinancialPortfolioId);
 	}
 

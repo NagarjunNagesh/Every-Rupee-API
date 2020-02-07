@@ -69,4 +69,9 @@ public class DashboardConstants {
 		public static final String DATE_MEANT_FOR = "dateMeantFor";
 		public static final String FINANCIAL_PORTFOLIO_ID = "financialPortfolioId";
 	}
+
+	public class BankAccount {
+		public static final String FINANCIAL_PORTFOLIO_ID = "financialPortfolioId";
+		public static final String BANK_ACCOUNT_ID = "bankAccountId";
+	}
 }
