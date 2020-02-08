@@ -2,6 +2,7 @@ package in.co.everyrupee.controller.user;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -9,11 +10,13 @@ import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -34,6 +37,8 @@ import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import in.co.everyrupee.constants.income.DashboardConstants;
 import in.co.everyrupee.constants.user.BankAccountConstants;
@@ -65,6 +70,8 @@ public class BankAccountIntegrationTest {
 
 	@Autowired
 	CacheManager cacheManager;
+
+	private final ObjectMapper objectMapper = new ObjectMapper();
 
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -113,14 +120,14 @@ public class BankAccountIntegrationTest {
 	@WithMockUser(value = "spring")
 	public void fetchAllBankAccounts() throws Exception {
 		getMvc().perform(get("/api/bankaccount/").contentType(MediaType.APPLICATION_JSON)
-				.param(DashboardConstants.Overview.FINANCIAL_PORTFOLIO_ID, FINANCIAL_PORTFOLIO_ID.toString()))
+				.param(DashboardConstants.BankAccount.FINANCIAL_PORTFOLIO_ID, FINANCIAL_PORTFOLIO_ID.toString()))
 				.andExpect(status().isOk()).andExpect(jsonPath("$[0]").isNotEmpty())
 				// .andDo(MockMvcResultHandlers.print())
 				.andExpect(jsonPath("$[0].accountBalance", is(100.0)));
 
 		// Testing the Cache Layer
 		getMvc().perform(get("/api/bankaccount/").contentType(MediaType.APPLICATION_JSON)
-				.param(DashboardConstants.Overview.FINANCIAL_PORTFOLIO_ID, FINANCIAL_PORTFOLIO_ID.toString()))
+				.param(DashboardConstants.BankAccount.FINANCIAL_PORTFOLIO_ID, FINANCIAL_PORTFOLIO_ID.toString()))
 				.andExpect(status().isOk()).andExpect(jsonPath("$[0]").isNotEmpty())
 				.andExpect(jsonPath("$[0].accountBalance", is(100.0)));
 
@@ -141,7 +148,7 @@ public class BankAccountIntegrationTest {
 	@WithMockUser(value = "spring")
 	public void previewBankAccounts() throws Exception {
 		getMvc().perform(get("/api/bankaccount/preview").contentType(MediaType.APPLICATION_JSON)
-				.param(DashboardConstants.Overview.FINANCIAL_PORTFOLIO_ID, FINANCIAL_PORTFOLIO_ID.toString()))
+				.param(DashboardConstants.BankAccount.FINANCIAL_PORTFOLIO_ID, FINANCIAL_PORTFOLIO_ID.toString()))
 				.andExpect(status().isOk()).andExpect(jsonPath("$[0]").isNotEmpty())
 				.andExpect(jsonPath("$[0].accountBalance", is(324.0)));
 
@@ -158,7 +165,7 @@ public class BankAccountIntegrationTest {
 
 		RequestBuilder request = MockMvcRequestBuilders.post("/api/bankaccount/select").param("id", "3232")
 				.param("selectedAccount", "false")
-				.param(DashboardConstants.Overview.FINANCIAL_PORTFOLIO_ID, FINANCIAL_PORTFOLIO_ID.toString())
+				.param(DashboardConstants.BankAccount.FINANCIAL_PORTFOLIO_ID, FINANCIAL_PORTFOLIO_ID.toString())
 				.accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE);
 
 		getMvc().perform(request).andExpect(status().isOk());
@@ -177,7 +184,7 @@ public class BankAccountIntegrationTest {
 		RequestBuilder request = MockMvcRequestBuilders.post("/api/bankaccount/add").param("id", "3232")
 				.param("selectedAccount", "false").param("linked", "false").param("userId", "3233")
 				.param("bankAccountName", "HDFC")
-				.param(DashboardConstants.Overview.FINANCIAL_PORTFOLIO_ID, FINANCIAL_PORTFOLIO_ID.toString())
+				.param(DashboardConstants.BankAccount.FINANCIAL_PORTFOLIO_ID, FINANCIAL_PORTFOLIO_ID.toString())
 				.param("accountBalance", "5655").param("accountType", "CASH").param("userId", "123456")
 				.accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE);
 
@@ -196,7 +203,7 @@ public class BankAccountIntegrationTest {
 	@WithMockUser(value = "spring")
 	public void categorizeBankAccounts() throws Exception {
 		getMvc().perform(get("/api/bankaccount/categorize").contentType(MediaType.APPLICATION_JSON)
-				.param(DashboardConstants.Overview.FINANCIAL_PORTFOLIO_ID, FINANCIAL_PORTFOLIO_ID.toString()))
+				.param(DashboardConstants.BankAccount.FINANCIAL_PORTFOLIO_ID, FINANCIAL_PORTFOLIO_ID.toString()))
 				.andExpect(status().isOk()).andExpect(jsonPath("$").isNotEmpty());
 
 	}
@@ -210,11 +217,37 @@ public class BankAccountIntegrationTest {
 	@WithMockUser(value = "spring")
 	public void deleteBankAccounts() throws Exception {
 		getMvc().perform(delete("/api/bankaccount/").contentType(MediaType.APPLICATION_JSON)
-				.param(DashboardConstants.Overview.FINANCIAL_PORTFOLIO_ID, FINANCIAL_PORTFOLIO_ID.toString()))
+				.param(DashboardConstants.BankAccount.FINANCIAL_PORTFOLIO_ID, FINANCIAL_PORTFOLIO_ID.toString()))
 				.andExpect(status().isOk()).andExpect(jsonPath("$").isNotEmpty());
 
 		verify(getBankAccountRepository(), times(1)).deleteAllBankAccounts(Mockito.anyString());
 
+	}
+
+	/**
+	 * TEST: patch a bank account
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	@WithMockUser(value = "spring")
+	public void patchThisBankAccount() throws Exception {
+		BankAccount bankAccount = new BankAccount();
+		bankAccount.setAccountBalance(12);
+		bankAccount.setFinancialPortfolioId(FINANCIAL_PORTFOLIO_ID);
+
+		// Testing the Cache Layer
+		when(getBankAccountRepository().findById(12345)).thenReturn(Optional.of(bankAccount));
+
+		getMvc().perform(patch("/api/bankaccount/12345").contentType(MediaType.APPLICATION_JSON_VALUE)
+				.content(objectMapper.writeValueAsString(bankAccount))).andExpect(status().isOk())
+				.andExpect(jsonPath("$").isNotEmpty());
+
+		verify(getBankAccountRepository(), times(1)).findById(Mockito.anyInt());
+		verify(getBankAccountRepository(), times(1)).save(Mockito.any(BankAccount.class));
+		// Ensuring that the cache contains the said values
+		assertThat(getCacheManager().getCache(BankAccountConstants.BANK_ACCOUNT_CACHE).get(FINANCIAL_PORTFOLIO_ID),
+				is(nullValue()));
 	}
 
 	private WebApplicationContext getContext() {

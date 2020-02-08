@@ -50,14 +50,17 @@ public class BankAccountController {
 	}
 
 	/**
-	 * Patch this Bank Accounts
+	 * Post Add New account
 	 * 
+	 * @param formData
 	 * @return
 	 */
-	@RequestMapping(value = "/{pBankAccountId}", method = RequestMethod.PATCH)
-	public List<BankAccount> patchThisBankAccounts(@RequestBody MultiValueMap<String, String> formData,
+	@RequestMapping(value = "/{bankAccountId}", method = RequestMethod.PATCH, consumes = MediaType.APPLICATION_JSON_VALUE)
+	public BankAccount patchBankAccount(@RequestBody BankAccount bankAccount,
 			@PathVariable(DashboardConstants.BankAccount.BANK_ACCOUNT_ID) @Size(min = 0, max = GenericConstants.MAX_ALLOWED_LENGTH_FINANCIAL_PORTFOLIO) String pBankAccountId) {
-		return getBankAccountService().getAllBankAccounts(pFinancialPortfolioId);
+
+		return getBankAccountService().updateBankAccount(pBankAccountId, bankAccount);
+
 	}
 
 	/**

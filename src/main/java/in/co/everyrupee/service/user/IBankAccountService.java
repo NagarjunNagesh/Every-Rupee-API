@@ -105,5 +105,5 @@ public interface IBankAccountService {
 	 * @param formData
 	 * @return
 	 */
-	public BankAccount updateBankAccount(String bankAccountId, MultiValueMap<String, String> formData);
+	public BankAccount updateBankAccount(String bankAccountId, BankAccount bankAccount);
 }
