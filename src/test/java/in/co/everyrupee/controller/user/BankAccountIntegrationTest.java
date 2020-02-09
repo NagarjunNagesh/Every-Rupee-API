@@ -250,6 +250,21 @@ public class BankAccountIntegrationTest {
 				is(nullValue()));
 	}
 
+	/**
+	 * TEST: delete a bank account
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void deleteThisBankAccount() throws Exception {
+
+		getMvc().perform(delete("/api/bankaccount/12345").contentType(MediaType.APPLICATION_JSON)
+				.param(DashboardConstants.BankAccount.FINANCIAL_PORTFOLIO_ID, FINANCIAL_PORTFOLIO_ID.toString()))
+				.andExpect(status().isOk()).andExpect(jsonPath("$").isNotEmpty());
+
+		verify(getBankAccountRepository(), times(1)).deleteById(12345);
+	}
+
 	private WebApplicationContext getContext() {
 		return context;
 	}

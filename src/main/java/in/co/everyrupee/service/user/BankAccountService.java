@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import javax.validation.constraints.Size;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -201,6 +203,13 @@ public class BankAccountService implements IBankAccountService {
 		LOGGER.warn("Bank account with Id {0} was not found for the financial portfolio id {1}", bankAccountId,
 				bankAccountOld.getFinancialPortfolioId());
 		return null;
+	}
+
+	@Override
+	@CacheEvict(key = "#pFinancialPortfolioId")
+	public void deleteBankAccount(@Size(min = 0, max = 60) String pBankAccountId,
+			@Size(min = 0, max = 60) String pFinancialPortfolioId) {
+		bankAccountRepository.deleteById(Integer.parseInt(pBankAccountId));
 	}
 
 	@Override

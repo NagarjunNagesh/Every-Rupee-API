@@ -106,7 +106,7 @@ public class BankAccountController {
 	 */
 	@RequestMapping(value = "/categorize", method = RequestMethod.GET)
 	public Map<String, Set<BankAccount>> categorizeBankAccount(
-			@RequestParam(DashboardConstants.Overview.FINANCIAL_PORTFOLIO_ID) @Size(min = 0, max = GenericConstants.MAX_ALLOWED_LENGTH_FINANCIAL_PORTFOLIO) String pFinancialPortfolioId) {
+			@RequestParam(DashboardConstants.BankAccount.FINANCIAL_PORTFOLIO_ID) @Size(min = 0, max = GenericConstants.MAX_ALLOWED_LENGTH_FINANCIAL_PORTFOLIO) String pFinancialPortfolioId) {
 		return getBankAccountService().categorizeBankAccount(pFinancialPortfolioId);
 	}
 
@@ -117,8 +117,22 @@ public class BankAccountController {
 	 */
 	@RequestMapping(value = "/", method = RequestMethod.DELETE)
 	public GenericResponse deleteAllBankAccounts(
-			@RequestParam(DashboardConstants.Overview.FINANCIAL_PORTFOLIO_ID) @Size(min = 0, max = GenericConstants.MAX_ALLOWED_LENGTH_FINANCIAL_PORTFOLIO) String pFinancialPortfolioId) {
+			@RequestParam(DashboardConstants.BankAccount.FINANCIAL_PORTFOLIO_ID) @Size(min = 0, max = GenericConstants.MAX_ALLOWED_LENGTH_FINANCIAL_PORTFOLIO) String pFinancialPortfolioId) {
 		getBankAccountService().deleteAllBankAccounts(pFinancialPortfolioId);
+
+		return new GenericResponse("success");
+	}
+
+	/**
+	 * Delete all bank accounts
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/{bankAccountId}", method = RequestMethod.DELETE)
+	public GenericResponse deleteBankAccount(
+			@PathVariable(DashboardConstants.BankAccount.BANK_ACCOUNT_ID) @Size(min = 0, max = GenericConstants.MAX_ALLOWED_LENGTH_FINANCIAL_PORTFOLIO) String pBankAccountId,
+			@RequestParam(DashboardConstants.BankAccount.FINANCIAL_PORTFOLIO_ID) @Size(min = 0, max = GenericConstants.MAX_ALLOWED_LENGTH_FINANCIAL_PORTFOLIO) String pFinancialPortfolioId) {
+		getBankAccountService().deleteBankAccount(pBankAccountId, pFinancialPortfolioId);
 
 		return new GenericResponse("success");
 	}
