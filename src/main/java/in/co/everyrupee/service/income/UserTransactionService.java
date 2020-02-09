@@ -296,7 +296,7 @@ public class UserTransactionService implements IUserTransactionService {
 				new OnAffectBankAccountBalanceEvent(null, amountToModify, userTransaction.get().getAccountId()));
 		// If category is income then reverse (-) or If category if expense then add (-)
 		amountToModify *= -1;
-		
+
 		// Auto update the bankaccount balance (New Account)
 		eventPublisher.publishEvent(new OnAffectBankAccountBalanceEvent(null, amountToModify, newAccountId));
 	}
@@ -534,6 +534,16 @@ public class UserTransactionService implements IUserTransactionService {
 	public void deleteUserTransactions(String pFinancialPortfolioId) {
 		userTransactionsRepository.deleteAllUserTransactions(pFinancialPortfolioId);
 
+	}
+
+	/**
+	 * Delete all transactions by bank account
+	 * 
+	 * @param bankAccountbyId
+	 */
+	@Override
+	public void deleteTransactionsByBankAccount(int bankAccountById) {
+		// TODO Auto-generated method stub
 	}
 
 }

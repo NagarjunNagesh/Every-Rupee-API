@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.MultiValueMap;
@@ -36,6 +37,9 @@ public class BankAccountService implements IBankAccountService {
 
 	@Autowired
 	private BankAccountRepository bankAccountRepository;
+
+	@Autowired
+	private ApplicationEventPublisher eventPublisher;
 
 	Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
@@ -210,6 +214,9 @@ public class BankAccountService implements IBankAccountService {
 	public void deleteBankAccount(@Size(min = 0, max = 60) String pBankAccountId,
 			@Size(min = 0, max = 60) String pFinancialPortfolioId) {
 		bankAccountRepository.deleteById(Integer.parseInt(pBankAccountId));
+
+		// Delete all transactions with account ID
+		eventPublisher.publishEvent(new DeleteTransactionByAccountId(bankAccount, transactionAmount, null));
 	}
 
 	@Override
