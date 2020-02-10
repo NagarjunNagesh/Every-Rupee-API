@@ -1,6 +1,11 @@
 package in.co.everyrupee.constants.user;
 
-public class BankAccountConstants {
+public final class BankAccountConstants {
+
+	// Prevent instantiation
+	private BankAccountConstants() {
+	}
+
 	public static final String BANK_ACCOUNT_TABLE = "bank_account";
 	public static final String BANK_ACCOUNT_ID = "id";
 	public static final String BANK_ACCOUNT_NAME = "bank_account_name";

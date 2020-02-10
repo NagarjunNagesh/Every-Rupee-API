@@ -1,6 +1,10 @@
 package in.co.everyrupee.constants.income;
 
-public class DashboardConstants {
+public final class DashboardConstants {
+
+	// prevent instantiation
+	private DashboardConstants() {
+	}
 
 	public static final String ID_SEQ = "id_seq";
 	public static final String DATE_FORMAT = "ddMMyyyy";
