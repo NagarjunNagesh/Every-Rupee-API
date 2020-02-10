@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.MultiValueMap;
 
 import in.co.everyrupee.constants.user.BankAccountConstants;
+import in.co.everyrupee.events.user.OnDeleteBankAccountCompleteEvent;
 import in.co.everyrupee.exception.InvalidAttributeValueException;
 import in.co.everyrupee.pojo.user.AccountType;
 import in.co.everyrupee.pojo.user.BankAccount;
@@ -213,10 +214,11 @@ public class BankAccountService implements IBankAccountService {
 	@CacheEvict(key = "#pFinancialPortfolioId")
 	public void deleteBankAccount(@Size(min = 0, max = 60) String pBankAccountId,
 			@Size(min = 0, max = 60) String pFinancialPortfolioId) {
-		bankAccountRepository.deleteById(Integer.parseInt(pBankAccountId));
+		int bankAccountIdInt = Integer.parseInt(pBankAccountId);
+		bankAccountRepository.deleteById(bankAccountIdInt);
 
 		// Delete all transactions with account ID
-		eventPublisher.publishEvent(new DeleteTransactionByAccountId(bankAccount, transactionAmount, null));
+		eventPublisher.publishEvent(new OnDeleteBankAccountCompleteEvent(bankAccountIdInt));
 	}
 
 	@Override

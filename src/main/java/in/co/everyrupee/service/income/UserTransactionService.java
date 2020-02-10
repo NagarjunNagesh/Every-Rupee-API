@@ -542,8 +542,9 @@ public class UserTransactionService implements IUserTransactionService {
 	 * @param bankAccountbyId
 	 */
 	@Override
+	@CacheEvict(value = DashboardConstants.Transactions.TRANSACTIONS_CACHE_NAME, allEntries = true)
 	public void deleteTransactionsByBankAccount(int bankAccountById) {
-		// TODO Auto-generated method stub
+		userTransactionsRepository.deleteByBankAccount(bankAccountById);
 	}
 
 }

@@ -84,4 +84,11 @@ public interface UserTransactionsRepository extends JpaRepository<UserTransactio
 	@Query("SELECT u.dateMeantFor FROM UserTransaction u where u.financialPortfolioId in ?1")
 	List<Date> findAllDatesByFPId(String financialPortfolioId);
 
+	/**
+	 * Delete by bank account id
+	 * 
+	 * @param pBankAccountId
+	 */
+	void deleteByBankAccount(int pBankAccountId);
+
 }
