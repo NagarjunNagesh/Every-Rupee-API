@@ -89,6 +89,8 @@ public interface UserTransactionsRepository extends JpaRepository<UserTransactio
 	 * 
 	 * @param pBankAccountId
 	 */
+	@Modifying
+	@Query("delete from UserTransaction u where u.accountId in ?1")
 	void deleteByBankAccount(int pBankAccountId);
 
 }
