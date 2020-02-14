@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import javax.validation.constraints.Size;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,11 +18,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.MultiValueMap;
 
 import in.co.everyrupee.constants.user.BankAccountConstants;
+import in.co.everyrupee.events.user.OnDeleteBankAccountCompleteEvent;
 import in.co.everyrupee.exception.InvalidAttributeValueException;
 import in.co.everyrupee.pojo.user.AccountType;
 import in.co.everyrupee.pojo.user.BankAccount;
@@ -34,6 +38,9 @@ public class BankAccountService implements IBankAccountService {
 
 	@Autowired
 	private BankAccountRepository bankAccountRepository;
+
+	@Autowired
+	private ApplicationEventPublisher eventPublisher;
 
 	Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
@@ -187,6 +194,31 @@ public class BankAccountService implements IBankAccountService {
 		// Update the new bank balance
 		bankAccount.setAccountBalance(bankAccount.getAccountBalance() + amountModified);
 		bankAccountRepository.save(bankAccount);
+	}
+
+	@Override
+	@CacheEvict(key = "#bankAccountOld.getFinancialPortfolioId()")
+	public BankAccount updateBankAccount(String bankAccountId, BankAccount bankAccountOld) {
+		Optional<BankAccount> bankAccount = bankAccountRepository.findById(Integer.parseInt(bankAccountId));
+
+		if (bankAccount.isPresent()) {
+			bankAccount.get().setAccountBalance(bankAccountOld.getAccountBalance());
+			return bankAccountRepository.save(bankAccount.get());
+		}
+		LOGGER.warn("Bank account with Id {0} was not found for the financial portfolio id {1}", bankAccountId,
+				bankAccountOld.getFinancialPortfolioId());
+		return null;
+	}
+
+	@Override
+	@CacheEvict(key = "#pFinancialPortfolioId")
+	public void deleteBankAccount(@Size(min = 0, max = 60) String pBankAccountId,
+			@Size(min = 0, max = 60) String pFinancialPortfolioId) {
+		int bankAccountIdInt = Integer.parseInt(pBankAccountId);
+		bankAccountRepository.deleteById(bankAccountIdInt);
+
+		// Delete all transactions with account ID
+		eventPublisher.publishEvent(new OnDeleteBankAccountCompleteEvent(bankAccountIdInt));
 	}
 
 	@Override

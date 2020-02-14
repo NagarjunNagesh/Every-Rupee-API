@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import javax.validation.constraints.Size;
+
 import org.springframework.util.MultiValueMap;
 
 import in.co.everyrupee.pojo.user.BankAccount;
@@ -97,4 +99,22 @@ public interface IBankAccountService {
 	 * @param bankAccountList
 	 */
 	public void saveAll(List<BankAccount> bankAccountList);
+
+	/**
+	 * Update Bank Account
+	 * 
+	 * @param bankAccountId
+	 * @param formData
+	 * @return
+	 */
+	public BankAccount updateBankAccount(String bankAccountId, BankAccount bankAccount);
+
+	/**
+	 * Delete bank account
+	 * 
+	 * @param pBankAccountId
+	 * @param pFinancialPortfolioId
+	 */
+	public void deleteBankAccount(@Size(min = 0, max = 60) String pBankAccountId,
+			@Size(min = 0, max = 60) String pFinancialPortfolioId);
 }

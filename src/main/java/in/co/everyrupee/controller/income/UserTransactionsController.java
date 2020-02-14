@@ -37,7 +37,7 @@ public class UserTransactionsController {
 	private IUserTransactionService userTransactionService;
 
 	/**
-	 * Get a Single User Transaction
+	 * Get User Transactions with Financial Portfolio Id
 	 * 
 	 * @param pFinancialPortfolioId
 	 * @param userPrincipal
@@ -62,7 +62,6 @@ public class UserTransactionsController {
 	@RequestMapping(value = "/categoryTotal/{pFinancialPortfolioId}", method = RequestMethod.GET)
 	public Map<Integer, Double> getCategoryTotalByFinancialPortfolioId(
 			@PathVariable @Size(min = 0, max = GenericConstants.MAX_ALLOWED_LENGTH_FINANCIAL_PORTFOLIO) String pFinancialPortfolioId,
-			Principal userPrincipal,
 			@RequestParam(DashboardConstants.Transactions.DATE_MEANT_FOR) @Size(min = 0, max = 10) String dateMeantFor,
 			@RequestParam(DashboardConstants.Transactions.UPDATE_BUDGET_PARAM) boolean updateBudget) {
 
@@ -131,7 +130,7 @@ public class UserTransactionsController {
 	}
 
 	/**
-	 * Delete all  User Transactions
+	 * Delete all User Transactions
 	 * 
 	 * @param pFinancialPortfolioId
 	 * @return

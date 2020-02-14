@@ -1,6 +1,11 @@
 package in.co.everyrupee.constants.user;
 
-public class BankAccountConstants {
+public final class BankAccountConstants {
+
+	// Prevent instantiation
+	private BankAccountConstants() {
+	}
+
 	public static final String BANK_ACCOUNT_TABLE = "bank_account";
 	public static final String BANK_ACCOUNT_ID = "id";
 	public static final String BANK_ACCOUNT_NAME = "bank_account_name";
@@ -21,4 +26,5 @@ public class BankAccountConstants {
 	public static final String NUMBER_OF_TIMES_SELECTED = "number_of_times_selected";
 	public static final String FINANCIAL_PORTFOLIO_ID_PARAM = "financialPortfolioId";
 	public static final String USER_ID_PARAM = "userId";
+	public static final String TRANSFER_TO_ACCOUNT = "transferToAccount";
 }

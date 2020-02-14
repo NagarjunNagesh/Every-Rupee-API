@@ -5,10 +5,12 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.validation.constraints.Size;
-import org.springframework.http.MediaType;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.util.MultiValueMap;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -43,8 +45,22 @@ public class BankAccountController {
 	 */
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public List<BankAccount> getAllBankAccounts(
-			@RequestParam(DashboardConstants.Overview.FINANCIAL_PORTFOLIO_ID) @Size(min = 0, max = GenericConstants.MAX_ALLOWED_LENGTH_FINANCIAL_PORTFOLIO) String pFinancialPortfolioId) {
+			@RequestParam(DashboardConstants.BankAccount.FINANCIAL_PORTFOLIO_ID) @Size(min = 0, max = GenericConstants.MAX_ALLOWED_LENGTH_FINANCIAL_PORTFOLIO) String pFinancialPortfolioId) {
 		return getBankAccountService().getAllBankAccounts(pFinancialPortfolioId);
+	}
+
+	/**
+	 * Post Add New account
+	 * 
+	 * @param formData
+	 * @return
+	 */
+	@RequestMapping(value = "/{bankAccountId}", method = RequestMethod.PATCH, consumes = MediaType.APPLICATION_JSON_VALUE)
+	public BankAccount patchBankAccount(@RequestBody BankAccount bankAccount,
+			@PathVariable(DashboardConstants.BankAccount.BANK_ACCOUNT_ID) @Size(min = 0, max = GenericConstants.MAX_ALLOWED_LENGTH_FINANCIAL_PORTFOLIO) String pBankAccountId) {
+
+		return getBankAccountService().updateBankAccount(pBankAccountId, bankAccount);
+
 	}
 
 	/**
@@ -59,13 +75,13 @@ public class BankAccountController {
 	}
 
 	/**
-	 * Get All User Budgets
+	 * Get the first 4 Bank Accounts
 	 * 
 	 * @return
 	 */
 	@RequestMapping(value = "/preview", method = RequestMethod.GET)
 	public List<BankAccount> previewBankAccounts(
-			@RequestParam(DashboardConstants.Overview.FINANCIAL_PORTFOLIO_ID) @Size(min = 0, max = GenericConstants.MAX_ALLOWED_LENGTH_FINANCIAL_PORTFOLIO) String pFinancialPortfolioId) {
+			@RequestParam(DashboardConstants.BankAccount.FINANCIAL_PORTFOLIO_ID) @Size(min = 0, max = GenericConstants.MAX_ALLOWED_LENGTH_FINANCIAL_PORTFOLIO) String pFinancialPortfolioId) {
 		return getBankAccountService().previewBankAccounts(pFinancialPortfolioId);
 	}
 
@@ -90,7 +106,7 @@ public class BankAccountController {
 	 */
 	@RequestMapping(value = "/categorize", method = RequestMethod.GET)
 	public Map<String, Set<BankAccount>> categorizeBankAccount(
-			@RequestParam(DashboardConstants.Overview.FINANCIAL_PORTFOLIO_ID) @Size(min = 0, max = GenericConstants.MAX_ALLOWED_LENGTH_FINANCIAL_PORTFOLIO) String pFinancialPortfolioId) {
+			@RequestParam(DashboardConstants.BankAccount.FINANCIAL_PORTFOLIO_ID) @Size(min = 0, max = GenericConstants.MAX_ALLOWED_LENGTH_FINANCIAL_PORTFOLIO) String pFinancialPortfolioId) {
 		return getBankAccountService().categorizeBankAccount(pFinancialPortfolioId);
 	}
 
@@ -101,8 +117,22 @@ public class BankAccountController {
 	 */
 	@RequestMapping(value = "/", method = RequestMethod.DELETE)
 	public GenericResponse deleteAllBankAccounts(
-			@RequestParam(DashboardConstants.Overview.FINANCIAL_PORTFOLIO_ID) @Size(min = 0, max = GenericConstants.MAX_ALLOWED_LENGTH_FINANCIAL_PORTFOLIO) String pFinancialPortfolioId) {
+			@RequestParam(DashboardConstants.BankAccount.FINANCIAL_PORTFOLIO_ID) @Size(min = 0, max = GenericConstants.MAX_ALLOWED_LENGTH_FINANCIAL_PORTFOLIO) String pFinancialPortfolioId) {
 		getBankAccountService().deleteAllBankAccounts(pFinancialPortfolioId);
+
+		return new GenericResponse("success");
+	}
+
+	/**
+	 * Delete all bank accounts
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/{bankAccountId}", method = RequestMethod.DELETE)
+	public GenericResponse deleteBankAccount(
+			@PathVariable(DashboardConstants.BankAccount.BANK_ACCOUNT_ID) @Size(min = 0, max = GenericConstants.MAX_ALLOWED_LENGTH_FINANCIAL_PORTFOLIO) String pBankAccountId,
+			@RequestParam(DashboardConstants.BankAccount.FINANCIAL_PORTFOLIO_ID) @Size(min = 0, max = GenericConstants.MAX_ALLOWED_LENGTH_FINANCIAL_PORTFOLIO) String pFinancialPortfolioId) {
+		getBankAccountService().deleteBankAccount(pBankAccountId, pFinancialPortfolioId);
 
 		return new GenericResponse("success");
 	}

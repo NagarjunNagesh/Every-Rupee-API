@@ -62,7 +62,7 @@ public class BankAccount {
 
 	@NotNull
 	@Column(name = BankAccountConstants.FINANCIAL_PORTFOLIO_ID)
-	@JsonProperty(access = Access.WRITE_ONLY)
+	@JsonProperty(access = Access.AUTO)
 	@Size(max = 60)
 	private String financialPortfolioId;
 

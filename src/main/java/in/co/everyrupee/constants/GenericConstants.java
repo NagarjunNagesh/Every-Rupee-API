@@ -6,7 +6,11 @@ package in.co.everyrupee.constants;
  * @author Nagarjun Nagesh
  *
  */
-public class GenericConstants {
+public final class GenericConstants {
+
+	// Prevent instantiation
+	private GenericConstants() {
+	}
 
 	// Ant Matchers
 	public static final String RESOURCES_ANT_MATCHER = "/resources/**";
