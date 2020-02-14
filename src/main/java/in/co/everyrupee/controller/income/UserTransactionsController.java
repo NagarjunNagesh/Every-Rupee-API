@@ -37,7 +37,7 @@ public class UserTransactionsController {
 	private IUserTransactionService userTransactionService;
 
 	/**
-	 * Get a Single User Transaction
+	 * Get User Transactions with Financial Portfolio Id
 	 * 
 	 * @param pFinancialPortfolioId
 	 * @param userPrincipal
