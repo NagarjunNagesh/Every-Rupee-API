@@ -1,5 +1,7 @@
 package in.co.everyrupee.controller.overview;
 
+import java.util.Optional;
+
 import javax.validation.Valid;
 import javax.validation.constraints.Size;
 
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import in.co.everyrupee.constants.GenericConstants;
 import in.co.everyrupee.constants.income.DashboardConstants;
 import in.co.everyrupee.pojo.TransactionType;
+import in.co.everyrupee.pojo.user.AccountType;
 import in.co.everyrupee.service.income.IUserTransactionService;
 
 /**
@@ -57,8 +60,13 @@ public class OverviewController {
 	public Object getLifetimeIncomeByFinancialPortfolioId(
 			@Valid @RequestParam(DashboardConstants.Overview.TYPE_PARAM) TransactionType type,
 			@RequestParam(DashboardConstants.Overview.AVERAGE_PARAM) boolean fetchAverage,
-			@RequestParam(DashboardConstants.Overview.FINANCIAL_PORTFOLIO_ID) @Size(min = 0, max = GenericConstants.MAX_ALLOWED_LENGTH_FINANCIAL_PORTFOLIO) String pFinancialPortfolioId) {
+			@RequestParam(DashboardConstants.Overview.FINANCIAL_PORTFOLIO_ID) @Size(min = 0, max = GenericConstants.MAX_ALLOWED_LENGTH_FINANCIAL_PORTFOLIO) String pFinancialPortfolioId,
+			@Valid @RequestParam(required = false, name = DashboardConstants.Overview.ACCOUNT_TYPE_PARAM) Optional<AccountType> accountType) {
 
+		// Check if the account type is present
+		if (accountType.isPresent()) {
+			return null;
+		}
 		return getUserTransactionService().fetchLifetimeCalculations(type, fetchAverage, pFinancialPortfolioId);
 	}
 
