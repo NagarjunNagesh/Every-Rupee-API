@@ -72,7 +72,7 @@ public final class DashboardConstants {
 		public static final String AVERAGE_PARAM = "average";
 		public static final String DATE_MEANT_FOR = "dateMeantFor";
 		public static final String FINANCIAL_PORTFOLIO_ID = "financialPortfolioId";
-		public static final String ACCOUNT_TYPE_PARAM = "accountType";
+		public static final String ACCOUNT_CATEGORIES_PARAM = "accountType";
 	}
 
 	public class BankAccount {

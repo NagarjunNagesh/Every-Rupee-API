@@ -5,10 +5,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Size;
 
 import org.springframework.util.MultiValueMap;
 
+import in.co.everyrupee.pojo.user.AccountCategories;
 import in.co.everyrupee.pojo.user.BankAccount;
 
 public interface IBankAccountService {
@@ -117,4 +119,15 @@ public interface IBankAccountService {
 	 */
 	public void deleteBankAccount(@Size(min = 0, max = 60) String pBankAccountId,
 			@Size(min = 0, max = 60) String pFinancialPortfolioId);
+
+	/**
+	 * Calculate account total
+	 * 
+	 * @param accountCategories
+	 * @param pFinancialPortfolioId
+	 * @param fetchAverage
+	 * @return
+	 */
+	public Object calculateTotal(@Valid Optional<AccountCategories> accountCategories,
+			@Size(min = 0, max = 60) String pFinancialPortfolioId, boolean fetchAverage);
 }

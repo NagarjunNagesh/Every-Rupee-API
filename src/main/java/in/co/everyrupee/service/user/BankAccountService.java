@@ -8,7 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Size;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -26,6 +28,7 @@ import org.springframework.util.MultiValueMap;
 import in.co.everyrupee.constants.user.BankAccountConstants;
 import in.co.everyrupee.events.user.OnDeleteBankAccountCompleteEvent;
 import in.co.everyrupee.exception.InvalidAttributeValueException;
+import in.co.everyrupee.pojo.user.AccountCategories;
 import in.co.everyrupee.pojo.user.AccountType;
 import in.co.everyrupee.pojo.user.BankAccount;
 import in.co.everyrupee.repository.user.BankAccountRepository;
@@ -234,6 +237,76 @@ public class BankAccountService implements IBankAccountService {
 	@Override
 	public void saveAll(List<BankAccount> bankAccountList) {
 		bankAccountRepository.saveAll(bankAccountList);
+	}
+
+	@Override
+	public Object calculateTotal(@Valid Optional<AccountCategories> accountCategories,
+			@Size(min = 0, max = 60) String pFinancialPortfolioId, boolean fetchAverage) {
+		if (pFinancialPortfolioId == null) {
+			throw new InvalidAttributeValueException("fetchUserTransactionByCreationDate", "financialPortfolioId",
+					pFinancialPortfolioId);
+		}
+
+		switch (accountCategories.get()) {
+
+		case ASSET:
+			// TODO
+		case LIABILITY:
+			// TODO
+		case ALL:
+			return calculateAllAccountBalance(fetchAverage, pFinancialPortfolioId);
+		default:
+			LOGGER.error("fetchLifetimeCalculations: TransactionType is not mapped to the ENUM class");
+			break;
+
+		}
+		return null;
+	}
+
+	/**
+	 * Calculate account balance for all accounts
+	 * 
+	 * @param fetchAverage
+	 * @param pFinancialPortfolioId
+	 * @return
+	 */
+	private Object calculateAllAccountBalance(boolean fetchAverage,
+			@Size(min = 0, max = 60) String pFinancialPortfolioId) {
+
+		if (fetchAverage) {
+			List<BankAccount> bankAccounts = bankAccountRepository.findByFinancialPortfolioId(pFinancialPortfolioId);
+
+			// Segregate bank account by ASSET / LIABILITY
+			Map<Boolean, List<BankAccount>> bankAccountByType = bankAccounts.parallelStream()
+					.collect(Collectors.partitioningBy(ba -> (ba.getAccountType().equals(AccountType.CREDITCARD)
+							|| ba.getAccountType().equals(AccountType.LIABILITY))));
+
+			List<BankAccount> liabliltyBA = bankAccountByType.get(true);
+			List<BankAccount> assetBA = bankAccountByType.get(false);
+
+			// Calculate the subtotal and return
+			Map<String, Double> assetAndLiableAmount = new HashMap<>();
+			double liabileAmount = 0d;
+			if (CollectionUtils.isNotEmpty(liabliltyBA)) {
+				liabileAmount = liabliltyBA.parallelStream()
+						.collect(Collectors.summingDouble(BankAccount::getAccountBalance));
+			}
+			// Assign Liable Amount
+			assetAndLiableAmount.put("Liability", liabileAmount);
+
+			double assetAmount = 0d;
+			if (CollectionUtils.isNotEmpty(assetBA)) {
+				assetAmount = assetBA.parallelStream()
+						.collect(Collectors.summingDouble(BankAccount::getAccountBalance));
+			}
+			// Assign asset amount
+			assetAndLiableAmount.put("Asset", assetAmount);
+
+			return assetAndLiableAmount;
+
+		}
+
+		return null;
 	}
 
 }

@@ -6,14 +6,19 @@ package in.co.everyrupee.service.user;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
+import org.apache.commons.collections4.MapUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,6 +32,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import in.co.everyrupee.pojo.user.AccountCategories;
+import in.co.everyrupee.pojo.user.AccountType;
 import in.co.everyrupee.pojo.user.BankAccount;
 import in.co.everyrupee.repository.user.BankAccountRepository;
 
@@ -42,6 +49,8 @@ public class BankAccountServiceTest {
 
 	@MockBean
 	private BankAccountRepository bankAccountRepository;
+
+	private List<BankAccount> allBankAccounts;
 
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -63,6 +72,27 @@ public class BankAccountServiceTest {
 		newAccount.setFinancialPortfolioId(FINANCIAL_PORTFOLIO_ID);
 		newAccount.setSelectedAccount(true);
 		Mockito.when(bankAccountRepository.save(Mockito.any())).thenReturn(newAccount);
+
+		// Build data
+		BankAccount bankAccount2 = new BankAccount();
+		bankAccount2.setFinancialPortfolioId(FINANCIAL_PORTFOLIO_ID);
+		bankAccount2.setLinked(true);
+		bankAccount2.setBankAccountName("ABCD");
+		bankAccount2.setNumberOfTimesSelected(100);
+		bankAccount2.setAccountBalance(324);
+		bankAccount2.setAccountType(AccountType.CASH);
+
+		BankAccount bankAccount = new BankAccount();
+		bankAccount.setFinancialPortfolioId(FINANCIAL_PORTFOLIO_ID);
+		bankAccount.setLinked(false);
+		bankAccount.setBankAccountName("EFGH");
+		bankAccount.setNumberOfTimesSelected(1);
+		bankAccount.setAccountBalance(100);
+		bankAccount.setAccountType(AccountType.CREDITCARD);
+
+		setAllBankAccounts(new ArrayList<BankAccount>());
+		getAllBankAccounts().add(bankAccount);
+		getAllBankAccounts().add(bankAccount2);
 	}
 
 	/**
@@ -119,8 +149,36 @@ public class BankAccountServiceTest {
 		verify(bankAccountRepository, times(1)).saveAll(bankAccountList);
 	}
 
+	/**
+	 * TEST: Calculate total
+	 */
+	@Test
+	public void calculateTotal() {
+		when(getBankAccountRepository().findByFinancialPortfolioId(FINANCIAL_PORTFOLIO_ID))
+				.thenReturn(getAllBankAccounts());
+
+		@SuppressWarnings("unchecked")
+		Map<String, Double> accountTotal = (Map<String, Double>) getBankAccountService()
+				.calculateTotal(Optional.of(AccountCategories.ALL), FINANCIAL_PORTFOLIO_ID, true);
+
+		assertTrue(MapUtils.isNotEmpty(accountTotal));
+		assertTrue(accountTotal.get("Liability") == 100);
+		assertTrue(accountTotal.get("Asset") == 324);
+	}
+
 	private BankAccountService getBankAccountService() {
 		return bankAccountService;
 	}
 
+	private List<BankAccount> getAllBankAccounts() {
+		return allBankAccounts;
+	}
+
+	private void setAllBankAccounts(List<BankAccount> allBankAccounts) {
+		this.allBankAccounts = allBankAccounts;
+	}
+
+	private BankAccountRepository getBankAccountRepository() {
+		return bankAccountRepository;
+	}
 }
