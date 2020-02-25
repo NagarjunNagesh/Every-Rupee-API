@@ -162,8 +162,8 @@ public class BankAccountServiceTest {
 				.calculateTotal(Optional.of(AccountCategories.ALL), FINANCIAL_PORTFOLIO_ID, true);
 
 		assertTrue(MapUtils.isNotEmpty(accountTotal));
-		assertTrue(accountTotal.get("Liability") == 100);
-		assertTrue(accountTotal.get("Asset") == 324);
+		assertTrue(accountTotal.get("liability") == 100);
+		assertTrue(accountTotal.get("asset") == 324);
 	}
 
 	private BankAccountService getBankAccountService() {

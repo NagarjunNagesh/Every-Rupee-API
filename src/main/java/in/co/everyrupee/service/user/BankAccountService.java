@@ -292,7 +292,7 @@ public class BankAccountService implements IBankAccountService {
 						.collect(Collectors.summingDouble(BankAccount::getAccountBalance));
 			}
 			// Assign Liable Amount
-			assetAndLiableAmount.put("Liability", liabileAmount);
+			assetAndLiableAmount.put("liability", liabileAmount);
 
 			double assetAmount = 0d;
 			if (CollectionUtils.isNotEmpty(assetBA)) {
@@ -300,7 +300,7 @@ public class BankAccountService implements IBankAccountService {
 						.collect(Collectors.summingDouble(BankAccount::getAccountBalance));
 			}
 			// Assign asset amount
-			assetAndLiableAmount.put("Asset", assetAmount);
+			assetAndLiableAmount.put("asset", assetAmount);
 
 			return assetAndLiableAmount;
 
