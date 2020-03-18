@@ -72,7 +72,7 @@ public class BankAccount {
 
 	@CreationTimestamp
 	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = DashboardConstants.CREATION_DATE)
+	@Column(name = DashboardConstants.CREATION_DATE, nullable = false, updatable = false)
 	@JsonProperty(access = Access.AUTO)
 	private Date createDate;
 
