@@ -1,5 +1,7 @@
 package in.co.everyrupee.controller.overview;
 
+import java.util.Optional;
+
 import javax.validation.Valid;
 import javax.validation.constraints.Size;
 
@@ -13,7 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 import in.co.everyrupee.constants.GenericConstants;
 import in.co.everyrupee.constants.income.DashboardConstants;
 import in.co.everyrupee.pojo.TransactionType;
+import in.co.everyrupee.pojo.user.AccountCategories;
 import in.co.everyrupee.service.income.IUserTransactionService;
+import in.co.everyrupee.service.user.IBankAccountService;
 
 /**
  *
@@ -29,6 +33,9 @@ public class OverviewController {
 
 	@Autowired
 	private IUserTransactionService userTransactionService;
+
+	@Autowired
+	private IBankAccountService bankAccountService;
 
 	/**
 	 * Get user transactions sorted by creation date - DESC
@@ -55,15 +62,24 @@ public class OverviewController {
 	 */
 	@RequestMapping(value = "/lifetime", method = RequestMethod.GET)
 	public Object getLifetimeIncomeByFinancialPortfolioId(
-			@Valid @RequestParam(DashboardConstants.Overview.TYPE_PARAM) TransactionType type,
+			@Valid @RequestParam(required = false, name = DashboardConstants.Overview.TYPE_PARAM) TransactionType type,
 			@RequestParam(DashboardConstants.Overview.AVERAGE_PARAM) boolean fetchAverage,
-			@RequestParam(DashboardConstants.Overview.FINANCIAL_PORTFOLIO_ID) @Size(min = 0, max = GenericConstants.MAX_ALLOWED_LENGTH_FINANCIAL_PORTFOLIO) String pFinancialPortfolioId) {
+			@RequestParam(DashboardConstants.Overview.FINANCIAL_PORTFOLIO_ID) @Size(min = 0, max = GenericConstants.MAX_ALLOWED_LENGTH_FINANCIAL_PORTFOLIO) String pFinancialPortfolioId,
+			@Valid @RequestParam(required = false, name = DashboardConstants.Overview.ACCOUNT_CATEGORIES_PARAM) Optional<AccountCategories> accountCategories) {
 
+		// Check if the account type is present
+		if (accountCategories.isPresent()) {
+			return getBankAccountService().calculateTotal(accountCategories, pFinancialPortfolioId, fetchAverage);
+		}
 		return getUserTransactionService().fetchLifetimeCalculations(type, fetchAverage, pFinancialPortfolioId);
 	}
 
 	private IUserTransactionService getUserTransactionService() {
 		return userTransactionService;
+	}
+
+	private IBankAccountService getBankAccountService() {
+		return bankAccountService;
 	}
 
 }

@@ -188,9 +188,8 @@ public class BankAccountIntegrationTest {
 				.param("accountBalance", "5655").param("accountType", "CASH").param("userId", "123456")
 				.accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE);
 
-		getMvc().perform(request).andExpect(status().isOk());
-//		.andExpect(jsonPath("$").isNotEmpty())
-//				.andExpect(jsonPath("$.accountBalance", is(324.0)));
+		getMvc().perform(request).andExpect(status().isOk()).andExpect(jsonPath("$").isNotEmpty())
+				.andExpect(jsonPath("$.accountBalance", is(324.0)));
 
 	}
 
