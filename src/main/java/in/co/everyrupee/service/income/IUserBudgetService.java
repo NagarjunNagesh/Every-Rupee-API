@@ -38,4 +38,6 @@ public interface IUserBudgetService {
 
 	void deleteAllUserBudgets(String financialPortfolioId);
 
+	void copyFromPreviousMonth();
+
 }

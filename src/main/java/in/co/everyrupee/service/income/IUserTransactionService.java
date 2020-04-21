@@ -33,4 +33,6 @@ public interface IUserTransactionService {
 
 	void deleteTransactionsByBankAccount(int bankAccountById);
 
+	void copyFromPreviousMonth();
+
 }

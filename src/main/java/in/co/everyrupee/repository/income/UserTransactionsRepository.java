@@ -93,4 +93,13 @@ public interface UserTransactionsRepository extends JpaRepository<UserTransactio
 	@Query("delete from UserTransaction u where u.accountId in ?1")
 	void deleteByBankAccount(int pBankAccountId);
 
+	/**
+	 * Fetch all user transactions by date
+	 * 
+	 * @param financialPortfolioId
+	 * @return
+	 */
+	@Query("SELECT u FROM UserTransaction u where u.dateMeantFor in ?1 and u.recurrence is MONTHLY")
+	List<UserTransaction> findRecurringTransactions(Date from);
+
 }

@@ -3,6 +3,9 @@ package in.co.everyrupee.service.income;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -500,10 +503,11 @@ public class UserTransactionService implements IUserTransactionService {
 		return dateAndAmountAsList;
 	}
 
-	/**
-	 * Fetch average amount parent category
+	/*
+	 * * Fetch average amount parent category
 	 * 
 	 * @param lifetimeTransactions
+	 * 
 	 * @return
 	 */
 	private Object fetchAverageAmount(List<UserTransaction> lifetimeTransactions) {
@@ -545,6 +549,44 @@ public class UserTransactionService implements IUserTransactionService {
 	@CacheEvict(value = DashboardConstants.Transactions.TRANSACTIONS_CACHE_NAME, allEntries = true)
 	public void deleteTransactionsByBankAccount(int bankAccountById) {
 		userTransactionsRepository.deleteByBankAccount(bankAccountById);
+	}
+
+	/**
+	 * Copy transactions from previous Months
+	 */
+	@Override
+	@CacheEvict(value = DashboardConstants.Transactions.TRANSACTIONS_CACHE_NAME, allEntries = true)
+	public void copyFromPreviousMonth() {
+
+		LocalDate previousMonthSameDay = LocalDate.now().minus(1, ChronoUnit.MONTHS).withDayOfMonth(1);
+		Date previousMonthsDate = Date.from(previousMonthSameDay.atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+		List<UserTransaction> userTransactions = userTransactionsRepository
+				.findRecurringTransactions(previousMonthsDate);
+
+		// If the transaction is empty then return null
+		if (CollectionUtils.isEmpty(userTransactions)) {
+			return;
+		}
+
+		// Create current date
+		LocalDate currentLocalDate = LocalDate.now().withDayOfMonth(1);
+		Date currentDate = Date.from(currentLocalDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+		// Create new user transactions from previous months
+		List<UserTransaction> newUserTransactions = new ArrayList<UserTransaction>();
+		for (UserTransaction previousUserTransaction : userTransactions) {
+			UserTransaction newUserTransaction = new UserTransaction();
+			newUserTransaction.setAmount(previousUserTransaction.getAmount());
+			newUserTransaction.setCategoryId(previousUserTransaction.getCategoryId());
+			newUserTransaction.setDateMeantFor(currentDate);
+			newUserTransaction.setDescription(previousUserTransaction.getDescription());
+			newUserTransaction.setFinancialPortfolioId(previousUserTransaction.getFinancialPortfolioId());
+			newUserTransaction.setRecurrence(previousUserTransaction.getRecurrence());
+			newUserTransaction.setAccountId(previousUserTransaction.getAccountId());
+			newUserTransactions.add(newUserTransaction);
+		}
+
+		userTransactionsRepository.saveAll(newUserTransactions);
 	}
 
 }
