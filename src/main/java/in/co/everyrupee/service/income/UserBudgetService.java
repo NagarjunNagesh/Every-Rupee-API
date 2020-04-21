@@ -566,6 +566,7 @@ public class UserBudgetService implements IUserBudgetService {
 	 * Copy from previous month
 	 */
 	@Override
+	@CacheEvict(value = DashboardConstants.Budget.BUDGET_CACHE_NAME, allEntries = true)
 	public void copyFromPreviousMonth() {
 		LocalDate previousMonthSameDay = LocalDate.now().minus(1, ChronoUnit.MONTHS).withDayOfMonth(1);
 		Date previousMonthsDate = Date.from(previousMonthSameDay.atStartOfDay(ZoneId.systemDefault()).toInstant());
