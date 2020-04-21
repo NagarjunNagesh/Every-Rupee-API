@@ -9,6 +9,9 @@ import static org.mockito.Mockito.when;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -232,6 +235,42 @@ public class UserTransactionServiceTest {
 		verify(getCategoryService(), times(1)).fetchCategories();
 		verify(getUserTransactionsRepository(), times(1)).findByFinancialPortfolioIdAndCategories(Mockito.anyString(),
 				Mockito.any());
+	}
+
+	/**
+	 * TEST: Copy from previous months But empty budget
+	 */
+	@Test
+	public void copyFromPreviousMonthsAndEmpty() {
+
+		// Copy from previous month
+		getUserTransactionService().copyFromPreviousMonth();
+
+		verify(getUserTransactionsRepository(), times(1)).findRecurringTransactions(Mockito.any());
+		verify(getUserTransactionsRepository(), times(0)).saveAll(Mockito.any());
+	}
+
+	/**
+	 * TEST: Copy from previous months but already copied
+	 */
+	@Test
+	public void copyFromPreviousMonths() {
+		LocalDate previousMonthSameDay = LocalDate.now().minus(1, ChronoUnit.MONTHS).withDayOfMonth(1);
+		Date previousMonthsDate = Date.from(previousMonthSameDay.atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+		List<UserTransaction> userTransactions = new ArrayList<>();
+		UserTransaction userTransaction = new UserTransaction();
+		userTransaction.setAccountId(123);
+		userTransactions.add(userTransaction);
+		// Fetch all budget mock
+		Mockito.when(getUserTransactionsRepository().findRecurringTransactions(previousMonthsDate))
+				.thenReturn(userTransactions);
+
+		// Copy from previous month
+		getUserTransactionService().copyFromPreviousMonth();
+
+		verify(getUserTransactionsRepository(), times(1)).findRecurringTransactions(Mockito.any());
+		verify(getUserTransactionsRepository(), times(1)).saveAll(Mockito.any());
 	}
 
 	private Date getDateMeantFor() {

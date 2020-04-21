@@ -606,9 +606,10 @@ public class UserBudgetService implements IUserBudgetService {
 			toSaveUserBudgets.add(newUserBudget);
 		}
 
-		// Save all the user budgets
-		getUserBudgetRepository().saveAll(toSaveUserBudgets);
-
+		if (CollectionUtils.isNotEmpty(toSaveUserBudgets)) {
+			// Save all the user budgets
+			getUserBudgetRepository().saveAll(toSaveUserBudgets);
+		}
 	}
 
 	public UserBudgetRepository getUserBudgetRepository() {

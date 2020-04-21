@@ -9,6 +9,9 @@ import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -303,6 +306,54 @@ public class UserBudgetServiceTest {
 
 		getUserBudgetService().changeCategoryWithUserBudget(FINANCIAL_PORTFOLIO_ID, formData);
 
+		verify(getUserBudgetRepository(), times(1)).saveAll(Mockito.any());
+	}
+
+	/**
+	 * TEST: Copy from previous months But empty budget
+	 */
+	@Test
+	public void copyFromPreviousMonthsAndEmpty() {
+
+		// Copy from previous month
+		getUserBudgetService().copyFromPreviousMonth();
+
+		verify(getUserBudgetRepository(), times(1)).findAllEmptyBudgetsFromDate(Mockito.any());
+		verify(getUserBudgetRepository(), times(0)).saveAll(Mockito.any());
+	}
+
+	/**
+	 * TEST: Copy from previous months but already copied
+	 */
+	@Test
+	public void copyFromPreviousMonthsButEqualToPresent() {
+
+		// Fetch all budget mock
+		Mockito.when(userBudgetRepository.findAllEmptyBudgetsFromDate(Mockito.any())).thenReturn(getUserBudgetList());
+
+		// Copy from previous month
+		getUserBudgetService().copyFromPreviousMonth();
+
+		verify(getUserBudgetRepository(), times(2)).findAllEmptyBudgetsFromDate(Mockito.any());
+		verify(getUserBudgetRepository(), times(0)).saveAll(Mockito.any());
+	}
+
+	/**
+	 * TEST: Copy from previous months but already copied
+	 */
+	@Test
+	public void copyFromPreviousMonths() {
+		LocalDate previousMonthSameDay = LocalDate.now().minus(1, ChronoUnit.MONTHS).withDayOfMonth(1);
+		Date previousMonthsDate = Date.from(previousMonthSameDay.atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+		// Fetch all budget mock
+		Mockito.when(userBudgetRepository.findAllEmptyBudgetsFromDate(previousMonthsDate))
+				.thenReturn(getUserBudgetList());
+
+		// Copy from previous month
+		getUserBudgetService().copyFromPreviousMonth();
+
+		verify(getUserBudgetRepository(), times(2)).findAllEmptyBudgetsFromDate(Mockito.any());
 		verify(getUserBudgetRepository(), times(1)).saveAll(Mockito.any());
 	}
 
