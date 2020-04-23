@@ -562,7 +562,7 @@ public class UserTransactionService implements IUserTransactionService {
 		Date previousMonthsDate = Date.from(previousMonthSameDay.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
 		List<UserTransaction> userTransactions = userTransactionsRepository
-				.findRecurringTransactions(previousMonthsDate);
+				.findRecurringTransactions(previousMonthsDate, RecurrencePeriod.MONTHLY);
 
 		// If the transaction is empty then return null
 		if (CollectionUtils.isEmpty(userTransactions)) {

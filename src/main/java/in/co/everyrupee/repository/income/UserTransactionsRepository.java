@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import in.co.everyrupee.pojo.RecurrencePeriod;
 import in.co.everyrupee.pojo.income.UserTransaction;
 
 /**
@@ -99,7 +100,7 @@ public interface UserTransactionsRepository extends JpaRepository<UserTransactio
 	 * @param financialPortfolioId
 	 * @return
 	 */
-	@Query("SELECT u FROM UserTransaction u where u.dateMeantFor in ?1 and u.recurrence is MONTHLY")
-	List<UserTransaction> findRecurringTransactions(Date from);
+	@Query("SELECT u FROM UserTransaction u where u.dateMeantFor in ?1 and u.recurrence in ?2")
+	List<UserTransaction> findRecurringTransactions(Date from, RecurrencePeriod recurrencePeriod);
 
 }

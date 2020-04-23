@@ -47,6 +47,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import in.co.everyrupee.constants.income.DashboardConstants;
+import in.co.everyrupee.pojo.RecurrencePeriod;
 import in.co.everyrupee.pojo.income.UserTransaction;
 import in.co.everyrupee.pojo.user.BankAccount;
 import in.co.everyrupee.repository.income.UserTransactionsRepository;
@@ -327,14 +328,16 @@ public class UserTransactionIntegrationTest {
 		userTransaction.setAccountId(123);
 		userTransactions.add(userTransaction);
 		// Fetch all budget mock
-		Mockito.when(getUserTransactionRepository().findRecurringTransactions(previousMonthsDate))
+		Mockito.when(
+				getUserTransactionRepository().findRecurringTransactions(previousMonthsDate, RecurrencePeriod.MONTHLY))
 				.thenReturn(userTransactions);
 
 		getMvc().perform(post("/api/transactions/copyFromPreviousMonth")
 				.contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE).accept(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk()).andExpect(jsonPath("$").isNotEmpty());
 
-		verify(getUserTransactionRepository(), times(1)).findRecurringTransactions(previousMonthsDate);
+		verify(getUserTransactionRepository(), times(1)).findRecurringTransactions(previousMonthsDate,
+				RecurrencePeriod.MONTHLY);
 		verify(getUserTransactionRepository(), times(1)).saveAll(Mockito.any());
 	}
 
