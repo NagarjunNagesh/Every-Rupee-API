@@ -37,6 +37,7 @@ import org.springframework.util.MultiValueMap;
 
 import in.co.everyrupee.constants.income.DashboardConstants;
 import in.co.everyrupee.exception.ResourceNotFoundException;
+import in.co.everyrupee.pojo.RecurrencePeriod;
 import in.co.everyrupee.pojo.TransactionType;
 import in.co.everyrupee.pojo.income.UserTransaction;
 import in.co.everyrupee.pojo.user.BankAccount;
@@ -246,7 +247,7 @@ public class UserTransactionServiceTest {
 		// Copy from previous month
 		getUserTransactionService().copyFromPreviousMonth();
 
-		verify(getUserTransactionsRepository(), times(1)).findRecurringTransactions(Mockito.any());
+		verify(getUserTransactionsRepository(), times(1)).findRecurringTransactions(Mockito.any(), Mockito.any());
 		verify(getUserTransactionsRepository(), times(0)).saveAll(Mockito.any());
 	}
 
@@ -263,13 +264,15 @@ public class UserTransactionServiceTest {
 		userTransaction.setAccountId(123);
 		userTransactions.add(userTransaction);
 		// Fetch all budget mock
-		Mockito.when(getUserTransactionsRepository().findRecurringTransactions(previousMonthsDate))
+		Mockito.when(
+				getUserTransactionsRepository().findRecurringTransactions(previousMonthsDate, RecurrencePeriod.MONTHLY))
 				.thenReturn(userTransactions);
 
 		// Copy from previous month
 		getUserTransactionService().copyFromPreviousMonth();
 
-		verify(getUserTransactionsRepository(), times(1)).findRecurringTransactions(Mockito.any());
+		verify(getUserTransactionsRepository(), times(1)).findRecurringTransactions(previousMonthsDate,
+				RecurrencePeriod.MONTHLY);
 		verify(getUserTransactionsRepository(), times(1)).saveAll(Mockito.any());
 	}
 

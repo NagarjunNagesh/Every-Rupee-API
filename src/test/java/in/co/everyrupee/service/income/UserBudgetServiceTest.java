@@ -318,7 +318,7 @@ public class UserBudgetServiceTest {
 		// Copy from previous month
 		getUserBudgetService().copyFromPreviousMonth();
 
-		verify(getUserBudgetRepository(), times(1)).findAllEmptyBudgetsFromDate(Mockito.any());
+		verify(getUserBudgetRepository(), times(1)).findAllBudgetsFromDate(Mockito.any());
 		verify(getUserBudgetRepository(), times(0)).saveAll(Mockito.any());
 	}
 
@@ -329,12 +329,12 @@ public class UserBudgetServiceTest {
 	public void copyFromPreviousMonthsButEqualToPresent() {
 
 		// Fetch all budget mock
-		Mockito.when(userBudgetRepository.findAllEmptyBudgetsFromDate(Mockito.any())).thenReturn(getUserBudgetList());
+		Mockito.when(userBudgetRepository.findAllBudgetsFromDate(Mockito.any())).thenReturn(getUserBudgetList());
 
 		// Copy from previous month
 		getUserBudgetService().copyFromPreviousMonth();
 
-		verify(getUserBudgetRepository(), times(2)).findAllEmptyBudgetsFromDate(Mockito.any());
+		verify(getUserBudgetRepository(), times(2)).findAllBudgetsFromDate(Mockito.any());
 		verify(getUserBudgetRepository(), times(0)).saveAll(Mockito.any());
 	}
 
@@ -347,13 +347,13 @@ public class UserBudgetServiceTest {
 		Date previousMonthsDate = Date.from(previousMonthSameDay.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
 		// Fetch all budget mock
-		Mockito.when(userBudgetRepository.findAllEmptyBudgetsFromDate(previousMonthsDate))
+		Mockito.when(userBudgetRepository.findAllBudgetsFromDate(previousMonthsDate))
 				.thenReturn(getUserBudgetList());
 
 		// Copy from previous month
 		getUserBudgetService().copyFromPreviousMonth();
 
-		verify(getUserBudgetRepository(), times(2)).findAllEmptyBudgetsFromDate(Mockito.any());
+		verify(getUserBudgetRepository(), times(2)).findAllBudgetsFromDate(Mockito.any());
 		verify(getUserBudgetRepository(), times(1)).saveAll(Mockito.any());
 	}
 

@@ -466,13 +466,13 @@ public class UserBudgetIntegrationTest {
 		userBudget.setPlanned(12);
 		userBudgets.add(userBudget);
 		// Fetch all budget mock
-		Mockito.when(getUserBudgetRepository().findAllEmptyBudgetsFromDate(previousMonthsDate)).thenReturn(userBudgets);
+		Mockito.when(getUserBudgetRepository().findAllBudgetsFromDate(previousMonthsDate)).thenReturn(userBudgets);
 
 		getMvc().perform(post("/api/budget/copyFromPreviousMonth")
 				.contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE).accept(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk()).andExpect(jsonPath("$").isNotEmpty());
 
-		verify(getUserBudgetRepository(), times(1)).findAllEmptyBudgetsFromDate(previousMonthsDate);
+		verify(getUserBudgetRepository(), times(1)).findAllBudgetsFromDate(previousMonthsDate);
 		verify(getUserBudgetRepository(), times(1)).saveAll(Mockito.any());
 
 	}

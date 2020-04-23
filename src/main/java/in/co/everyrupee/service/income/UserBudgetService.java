@@ -571,8 +571,7 @@ public class UserBudgetService implements IUserBudgetService {
 		LocalDate previousMonthSameDay = LocalDate.now().minus(1, ChronoUnit.MONTHS).withDayOfMonth(1);
 		Date previousMonthsDate = Date.from(previousMonthSameDay.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
-		List<UserBudget> previousUserBudgets = getUserBudgetRepository()
-				.findAllEmptyBudgetsFromDate(previousMonthsDate);
+		List<UserBudget> previousUserBudgets = getUserBudgetRepository().findAllBudgetsFromDate(previousMonthsDate);
 
 		// If the transaction is empty then return null
 		if (CollectionUtils.isEmpty(previousUserBudgets)) {
@@ -582,25 +581,28 @@ public class UserBudgetService implements IUserBudgetService {
 		// Create current date
 		LocalDate currentLocalDate = LocalDate.now().withDayOfMonth(1);
 		Date currentDate = Date.from(currentLocalDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-		List<UserBudget> newUserBudgets = getUserBudgetRepository().findAllEmptyBudgetsFromDate(currentDate);
-		List<Integer> currentCategoryIds = new ArrayList<>();
+		List<UserBudget> newUserBudgets = getUserBudgetRepository().findAllBudgetsFromDate(currentDate);
+		List<String> currentCategoryIds = new ArrayList<>();
 
 		// If user budget is not empty then
 		if (CollectionUtils.isNotEmpty(newUserBudgets)) {
-			currentCategoryIds = newUserBudgets.stream().map(UserBudget::getCategoryId).collect(Collectors.toList());
+			currentCategoryIds = newUserBudgets.stream().map(ub -> (ub.getCategoryId() + ub.getFinancialPortfolioId()))
+					.collect(Collectors.toList());
 		}
 
-		List<UserBudget> toSaveUserBudgets = new ArrayList<UserBudget>();
+		String dateMeantFor = new StringBuilder().append(currentLocalDate.getDayOfMonth())
+				.append(currentLocalDate.getMonthValue()).append(+currentLocalDate.getYear()).toString();
+		List<UserBudget> toSaveUserBudgets = new ArrayList<>();
 		for (UserBudget previousUserBudget : previousUserBudgets) {
 			// if the category id is present in the current user budget
-			if (currentCategoryIds.contains(previousUserBudget.getCategoryId())) {
+			if (currentCategoryIds
+					.contains(previousUserBudget.getCategoryId() + previousUserBudget.getFinancialPortfolioId())) {
+				logger.warn("Current category ids is already present {} ", previousUserBudget.getCategoryId());
 				continue;
 			}
 
-			String dateMeantFor = new StringBuilder().append(currentLocalDate.getDayOfMonth())
-					.append(currentLocalDate.getMonthValue()).append(+currentLocalDate.getYear()).toString();
-
 			toSaveUserBudgets.add(createNewUserBudget(currentDate, previousUserBudget, dateMeantFor));
+			logger.info("Created a new user budget for the category {} ", previousUserBudget.getCategoryId());
 		}
 
 		if (CollectionUtils.isNotEmpty(toSaveUserBudgets)) {

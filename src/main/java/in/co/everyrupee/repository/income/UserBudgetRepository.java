@@ -120,5 +120,5 @@ public interface UserBudgetRepository extends JpaRepository<UserBudget, BigInteg
 	 * @return
 	 */
 	@Query("SELECT u FROM UserBudget u where u.dateMeantFor in ?1")
-	List<UserBudget> findAllEmptyBudgetsFromDate(Date from);
+	List<UserBudget> findAllBudgetsFromDate(Date from);
 }
