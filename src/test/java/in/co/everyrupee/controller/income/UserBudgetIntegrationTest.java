@@ -462,6 +462,8 @@ public class UserBudgetIntegrationTest {
 		List<UserBudget> userBudgets = new ArrayList<>();
 		UserBudget userBudget = new UserBudget();
 		userBudget.setCategoryId(12345);
+		userBudget.setFinancialPortfolioId("123456788");
+		userBudget.setPlanned(12);
 		userBudgets.add(userBudget);
 		// Fetch all budget mock
 		Mockito.when(getUserBudgetRepository().findAllEmptyBudgetsFromDate(previousMonthsDate)).thenReturn(userBudgets);
