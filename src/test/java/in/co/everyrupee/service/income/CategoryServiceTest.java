@@ -3,9 +3,11 @@ package in.co.everyrupee.service.income;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertTrue;
 
+import in.co.everyrupee.exception.ResourceNotFoundException;
+import in.co.everyrupee.pojo.income.Category;
+import in.co.everyrupee.repository.income.CategoryRepository;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,93 +20,78 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import in.co.everyrupee.exception.ResourceNotFoundException;
-import in.co.everyrupee.pojo.income.Category;
-import in.co.everyrupee.repository.income.CategoryRepository;
-
 @RunWith(SpringRunner.class)
 public class CategoryServiceTest {
 
-	@Autowired
-	private CategoryService categoryService;
+  @Autowired private CategoryService categoryService;
 
-	@MockBean
-	private CategoryRepository categoryRepository;
+  @MockBean private CategoryRepository categoryRepository;
 
-	Logger logger = LoggerFactory.getLogger(this.getClass());
+  Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	private List<Category> categoryList;
+  private List<Category> categoryList;
 
-	@TestConfiguration
-	static class CategoryServiceImplTestContextConfiguration {
+  @TestConfiguration
+  static class CategoryServiceImplTestContextConfiguration {
 
-		@Bean
-		public CategoryService categoryService() {
-			return new CategoryService();
-		}
+    @Bean
+    public CategoryService categoryService() {
+      return new CategoryService();
+    }
+  }
 
-	}
+  @Before
+  public void setUp() {
+    Category category = new Category();
+    category.setCategoryId(3);
+    category.setCategoryName("Beauty");
+    category.setParentCategory("2");
 
-	@Before
-	public void setUp() {
-		Category category = new Category();
-		category.setCategoryId(3);
-		category.setCategoryName("Beauty");
-		category.setParentCategory("2");
+    setCategoryList(new ArrayList<Category>());
+    getCategoryList().add(category);
+  }
 
-		setCategoryList(new ArrayList<Category>());
-		getCategoryList().add(category);
-	}
+  /** TEST: Fetch All categories */
+  @Test
+  public void fetchCategories() {
+    // Fetch all categories
+    Mockito.when(getCategoryRepository().fetchAllCategories()).thenReturn(getCategoryList());
 
-	/**
-	 * TEST: Fetch All categories
-	 */
-	@Test
-	public void fetchCategories() {
-		// Fetch all categories
-		Mockito.when(getCategoryRepository().fetchAllCategories()).thenReturn(getCategoryList());
+    List<Category> categoryList = getCategoryService().fetchCategories();
 
-		List<Category> categoryList = getCategoryService().fetchCategories();
+    assertThat(categoryList).isNotEmpty();
+  }
 
-		assertThat(categoryList).isNotEmpty();
+  /** TEST: Fetch all categories (EXCEPTION) */
+  @Test(expected = ResourceNotFoundException.class)
+  public void fetchCategoriesException() {
+    getCategoryService().fetchCategories();
+  }
 
-	}
+  /** TEST: Fetch All categories */
+  @Test
+  public void categoryIncome() {
+    // Fetch all categories
+    Mockito.when(getCategoryRepository().fetchAllCategories()).thenReturn(getCategoryList());
 
-	/**
-	 * TEST: Fetch all categories (EXCEPTION)
-	 */
-	@Test(expected = ResourceNotFoundException.class)
-	public void fetchCategoriesException() {
-		getCategoryService().fetchCategories();
-	}
+    Boolean categoryPresent = getCategoryService().categoryIncome(3);
 
-	/**
-	 * TEST: Fetch All categories
-	 */
-	@Test
-	public void categoryIncome() {
-		// Fetch all categories
-		Mockito.when(getCategoryRepository().fetchAllCategories()).thenReturn(getCategoryList());
+    assertTrue(categoryPresent);
+  }
 
-		Boolean categoryPresent = getCategoryService().categoryIncome(3);
+  private CategoryRepository getCategoryRepository() {
+    return categoryRepository;
+  }
 
-		assertTrue(categoryPresent);
-	}
+  private CategoryService getCategoryService() {
+    return categoryService;
+  }
 
-	private CategoryRepository getCategoryRepository() {
-		return categoryRepository;
-	}
+  private List<Category> getCategoryList() {
+    return categoryList;
+  }
 
-	private CategoryService getCategoryService() {
-		return categoryService;
-	}
-
-	private List<Category> getCategoryList() {
-		return categoryList;
-	}
-
-	private void setCategoryList(List<Category> categoryList) {
-		this.categoryList = categoryList;
-	}
-
+  private void setCategoryList(List<Category> categoryList) {
+    this.categoryList = categoryList;
+  }
 }
