@@ -1,6 +1,4 @@
-/**
- * 
- */
+/** */
 package in.co.everyrupee.configuration;
 
 import org.slf4j.Logger;
@@ -12,20 +10,17 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 
 /**
  * Implement Security Configuration for Web Application
- * 
- * @author Nagarjun Nagesh
  *
+ * @author Nagarjun Nagesh
  */
-
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-	Logger logger = LoggerFactory.getLogger(this.getClass());
+  Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	@Override
-	protected void configure(HttpSecurity http) throws Exception {
-		http.authorizeRequests().anyRequest().permitAll().and().csrf().disable();
-	}
-
+  @Override
+  protected void configure(HttpSecurity http) throws Exception {
+    http.authorizeRequests().anyRequest().permitAll().and().csrf().disable();
+  }
 }
