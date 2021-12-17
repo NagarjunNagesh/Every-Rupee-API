@@ -35,4 +35,6 @@ public interface IUserTransactionService {
   void deleteUserTransactions(String pFinancialPortfolioId);
 
   void deleteTransactionsByBankAccount(int bankAccountById);
+
+  void copyFromPreviousMonth();
 }

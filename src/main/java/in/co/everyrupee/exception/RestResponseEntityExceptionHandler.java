@@ -1,8 +1,5 @@
 package in.co.everyrupee.exception;
 
-import in.co.everyrupee.exception.login.PasswordNotValidException;
-import in.co.everyrupee.exception.login.UserAlreadyExistException;
-import in.co.everyrupee.exception.login.UserNotFoundException;
 import in.co.everyrupee.utils.GenericResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -61,32 +58,6 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
         ex, bodyOfResponse, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
   }
 
-  // 404
-  @ExceptionHandler({UserNotFoundException.class})
-  @ResponseBody
-  public ResponseEntity<Object> handleUserNotFound(
-      final RuntimeException ex, final WebRequest request) {
-    logger.error("404 Status Code", ex);
-    final GenericResponse bodyOfResponse =
-        new GenericResponse(
-            messages.getMessage("message.userNotFound", null, request.getLocale()), "UserNotFound");
-    return handleExceptionInternal(
-        ex, bodyOfResponse, new HttpHeaders(), HttpStatus.NOT_FOUND, request);
-  }
-
-  // 409
-  @ExceptionHandler({UserAlreadyExistException.class})
-  @ResponseBody
-  public ResponseEntity<Object> handleUserAlreadyExist(
-      final RuntimeException ex, final WebRequest request) {
-    logger.error("409 Status Code", ex);
-    final GenericResponse bodyOfResponse =
-        new GenericResponse(
-            messages.getMessage("message.regError", null, request.getLocale()), "UserAlreadyExist");
-    return handleExceptionInternal(
-        ex, bodyOfResponse, new HttpHeaders(), HttpStatus.CONFLICT, request);
-  }
-
   // 500
   @ExceptionHandler({MailAuthenticationException.class})
   @ResponseBody
@@ -110,20 +81,6 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
             messages.getMessage("message.error", null, request.getLocale()), "InternalError");
     return new ResponseEntity<Object>(
         bodyOfResponse, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
-  }
-
-  // 400
-  @ExceptionHandler({PasswordNotValidException.class})
-  @ResponseBody
-  public ResponseEntity<Object> handlePasswordNotValidException(
-      final RuntimeException ex, final WebRequest request) {
-    logger.error("400 Status Code", ex);
-    final GenericResponse bodyOfResponse =
-        new GenericResponse(
-            messages.getMessage("message.passwordNotValidError", null, request.getLocale()),
-            "PasswordNotValid");
-    return handleExceptionInternal(
-        ex, bodyOfResponse, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
   }
 
   // 400

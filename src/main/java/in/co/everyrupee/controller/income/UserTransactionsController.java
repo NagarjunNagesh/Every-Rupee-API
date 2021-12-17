@@ -159,4 +159,16 @@ public class UserTransactionsController {
 
     return new GenericResponse("success");
   }
+
+  // Fetch all the dates with the user budget data for the user
+  @RequestMapping(
+      value = "/copyFromPreviousMonth",
+      method = RequestMethod.POST,
+      consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+  public GenericResponse copyFromPreviousMonth() {
+
+    userTransactionService.copyFromPreviousMonth();
+
+    return new GenericResponse("success");
+  }
 }

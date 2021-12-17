@@ -44,4 +44,6 @@ public interface IUserBudgetService {
       String financialPortfolioId, MultiValueMap<String, String> formData);
 
   void deleteAllUserBudgets(String financialPortfolioId);
+
+  void copyFromPreviousMonth();
 }

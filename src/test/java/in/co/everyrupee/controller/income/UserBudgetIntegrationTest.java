@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -21,6 +22,9 @@ import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -535,6 +539,40 @@ public class UserBudgetIntegrationTest {
         .andExpect(jsonPath("$").isNotEmpty());
 
     verify(getUserBudgetRepository(), times(1)).deleteAllUserBudgets(Mockito.anyString());
+  }
+
+  /**
+   * TEST: Delete user Budget by financial portfolio Id
+   *
+   * @throws Exception
+   */
+  @WithMockUser(value = "spring")
+  @Test
+  public void copyFromPreviousMonth() throws Exception {
+    LocalDate previousMonthSameDay = LocalDate.now().minus(1, ChronoUnit.MONTHS).withDayOfMonth(1);
+    Date previousMonthsDate =
+        Date.from(previousMonthSameDay.atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+    List<UserBudget> userBudgets = new ArrayList<>();
+    UserBudget userBudget = new UserBudget();
+    userBudget.setCategoryId(12345);
+    userBudget.setFinancialPortfolioId("123456788");
+    userBudget.setPlanned(12);
+    userBudgets.add(userBudget);
+    // Fetch all budget mock
+    Mockito.when(getUserBudgetRepository().findAllBudgetsFromDate(previousMonthsDate))
+        .thenReturn(userBudgets);
+
+    getMvc()
+        .perform(
+            post("/api/budget/copyFromPreviousMonth")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+                .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$").isNotEmpty());
+
+    verify(getUserBudgetRepository(), times(1)).findAllBudgetsFromDate(previousMonthsDate);
+    verify(getUserBudgetRepository(), times(1)).saveAll(Mockito.any());
   }
 
   private UserBudgetRepository getUserBudgetRepository() {

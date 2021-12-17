@@ -15,6 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import in.co.everyrupee.constants.income.DashboardConstants;
+import in.co.everyrupee.pojo.RecurrencePeriod;
 import in.co.everyrupee.pojo.income.UserTransaction;
 import in.co.everyrupee.pojo.user.BankAccount;
 import in.co.everyrupee.repository.income.UserTransactionsRepository;
@@ -22,6 +23,9 @@ import in.co.everyrupee.repository.user.BankAccountRepository;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -346,6 +350,41 @@ public class UserTransactionIntegrationTest {
         .andExpect(jsonPath("$").isNotEmpty());
 
     verify(getUserTransactionRepository(), times(1)).deleteAllUserTransactions(Mockito.anyString());
+  }
+
+  /**
+   * TEST: Copy Previous Months Recurring transactions
+   *
+   * @throws Exception
+   */
+  @WithMockUser(value = "spring")
+  @Test
+  public void copyFromPreviousMonth() throws Exception {
+    LocalDate previousMonthSameDay = LocalDate.now().minus(1, ChronoUnit.MONTHS).withDayOfMonth(1);
+    Date previousMonthsDate =
+        Date.from(previousMonthSameDay.atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+    List<UserTransaction> userTransactions = new ArrayList<>();
+    UserTransaction userTransaction = new UserTransaction();
+    userTransaction.setAccountId(123);
+    userTransactions.add(userTransaction);
+    // Fetch all budget mock
+    Mockito.when(
+            getUserTransactionRepository()
+                .findRecurringTransactions(previousMonthsDate, RecurrencePeriod.MONTHLY))
+        .thenReturn(userTransactions);
+
+    getMvc()
+        .perform(
+            post("/api/transactions/copyFromPreviousMonth")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+                .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$").isNotEmpty());
+
+    verify(getUserTransactionRepository(), times(1))
+        .findRecurringTransactions(previousMonthsDate, RecurrencePeriod.MONTHLY);
+    verify(getUserTransactionRepository(), times(1)).saveAll(Mockito.any());
   }
 
   private MockMvc getMvc() {
