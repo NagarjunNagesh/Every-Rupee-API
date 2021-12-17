@@ -1,11 +1,10 @@
 package in.co.everyrupee.service.income;
 
+import in.co.everyrupee.pojo.income.Category;
 import java.util.List;
 
-import in.co.everyrupee.pojo.income.Category;
-
 public interface ICategoryService {
-    List<Category> fetchCategories();
-    
-    Boolean categoryIncome(int categoryId);
+  List<Category> fetchCategories();
+
+  Boolean categoryIncome(int categoryId);
 }

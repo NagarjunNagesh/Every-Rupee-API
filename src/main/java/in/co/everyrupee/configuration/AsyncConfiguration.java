@@ -1,7 +1,6 @@
 package in.co.everyrupee.configuration;
 
 import java.util.concurrent.Executor;
-
 import org.apache.tomcat.util.threads.ThreadPoolExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,16 +12,15 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 /**
- * Create a custom Async Configuration which overrides the default core size, max size and pool size for efficiency
- * 
- * @author nagarjun
+ * Create a custom Async Configuration which overrides the default core size, max size and pool size
+ * for efficiency
  *
+ * @author nagarjun
  */
 @EnableAsync
 @Configuration
 @ConfigurationProperties(prefix = "async.thread.pool")
 public class AsyncConfiguration implements AsyncConfigurer {
-
 
   @Override
   public Executor getAsyncExecutor() {
@@ -35,13 +33,9 @@ public class AsyncConfiguration implements AsyncConfigurer {
     executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
     executor.initialize();
     return executor;
-
   }
 
-  /**
-   * Custom exception for async errors
-   * 
-   */
+  /** Custom exception for async errors */
   @Override
   public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
 
@@ -50,7 +44,5 @@ public class AsyncConfiguration implements AsyncConfigurer {
       Logger logger = LoggerFactory.getLogger(targetClass);
       logger.error(ex.getMessage(), ex);
     };
-
   }
-
 }

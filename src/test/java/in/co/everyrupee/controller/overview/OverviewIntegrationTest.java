@@ -8,9 +8,15 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import in.co.everyrupee.constants.income.DashboardConstants;
+import in.co.everyrupee.pojo.TransactionType;
+import in.co.everyrupee.pojo.user.AccountCategories;
+import in.co.everyrupee.pojo.user.AccountType;
+import in.co.everyrupee.pojo.user.BankAccount;
+import in.co.everyrupee.repository.income.UserTransactionsRepository;
+import in.co.everyrupee.repository.user.BankAccountRepository;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,136 +32,133 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import in.co.everyrupee.constants.income.DashboardConstants;
-import in.co.everyrupee.pojo.TransactionType;
-import in.co.everyrupee.pojo.user.AccountCategories;
-import in.co.everyrupee.pojo.user.AccountType;
-import in.co.everyrupee.pojo.user.BankAccount;
-import in.co.everyrupee.repository.income.UserTransactionsRepository;
-import in.co.everyrupee.repository.user.BankAccountRepository;
-
 /**
  * Overview Controller Test (Controller)
- * 
- * @author Nagarjun
  *
+ * @author Nagarjun
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class OverviewIntegrationTest {
 
-	@Autowired
-	private WebApplicationContext context;
+  @Autowired private WebApplicationContext context;
 
-	@MockBean
-	private UserTransactionsRepository userTransactionRepository;
+  @MockBean private UserTransactionsRepository userTransactionRepository;
 
-	@MockBean
-	private BankAccountRepository bankAccountRepository;
+  @MockBean private BankAccountRepository bankAccountRepository;
 
-	private List<BankAccount> allBankAccounts;
+  private List<BankAccount> allBankAccounts;
 
-	private MockMvc mvc;
+  private MockMvc mvc;
 
-	private static final String DATE_MEANT_FOR = "01082019";
-	private static final String FINANCIAL_PORTFOLIO_ID = "193000000";
+  private static final String DATE_MEANT_FOR = "01082019";
+  private static final String FINANCIAL_PORTFOLIO_ID = "193000000";
 
-	@Before
-	public void setUp() {
-		setMvc(MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build());
+  @Before
+  public void setUp() {
+    setMvc(MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build());
 
-		// Build data
-		BankAccount bankAccount2 = new BankAccount();
-		bankAccount2.setFinancialPortfolioId(FINANCIAL_PORTFOLIO_ID);
-		bankAccount2.setLinked(true);
-		bankAccount2.setBankAccountName("ABCD");
-		bankAccount2.setNumberOfTimesSelected(100);
-		bankAccount2.setAccountBalance(324);
-		bankAccount2.setAccountType(AccountType.CASH);
+    // Build data
+    BankAccount bankAccount2 = new BankAccount();
+    bankAccount2.setFinancialPortfolioId(FINANCIAL_PORTFOLIO_ID);
+    bankAccount2.setLinked(true);
+    bankAccount2.setBankAccountName("ABCD");
+    bankAccount2.setNumberOfTimesSelected(100);
+    bankAccount2.setAccountBalance(324);
+    bankAccount2.setAccountType(AccountType.CASH);
 
-		BankAccount bankAccount = new BankAccount();
-		bankAccount.setFinancialPortfolioId(FINANCIAL_PORTFOLIO_ID);
-		bankAccount.setLinked(false);
-		bankAccount.setBankAccountName("EFGH");
-		bankAccount.setNumberOfTimesSelected(1);
-		bankAccount.setAccountBalance(100);
-		bankAccount.setAccountType(AccountType.CREDITCARD);
+    BankAccount bankAccount = new BankAccount();
+    bankAccount.setFinancialPortfolioId(FINANCIAL_PORTFOLIO_ID);
+    bankAccount.setLinked(false);
+    bankAccount.setBankAccountName("EFGH");
+    bankAccount.setNumberOfTimesSelected(1);
+    bankAccount.setAccountBalance(100);
+    bankAccount.setAccountType(AccountType.CREDITCARD);
 
-		setAllBankAccounts(new ArrayList<BankAccount>());
-		getAllBankAccounts().add(bankAccount);
-		getAllBankAccounts().add(bankAccount2);
+    setAllBankAccounts(new ArrayList<BankAccount>());
+    getAllBankAccounts().add(bankAccount);
+    getAllBankAccounts().add(bankAccount2);
+  }
 
-	}
+  /**
+   * TEST: Get User Transactions by financial Portfolio id
+   *
+   * @throws Exception
+   */
+  @WithMockUser(value = "spring")
+  @Test
+  public void getUserTransactionsByFinancialPortfolioId() throws Exception {
 
-	/**
-	 * TEST: Get User Transactions by financial Portfolio id
-	 * 
-	 * @throws Exception
-	 */
-	@WithMockUser(value = "spring")
-	@Test
-	public void getUserTransactionsByFinancialPortfolioId() throws Exception {
+    getMvc()
+        .perform(
+            get("/api/overview/recentTransactions")
+                .contentType(MediaType.APPLICATION_JSON)
+                .param(DashboardConstants.Overview.DATE_MEANT_FOR, DATE_MEANT_FOR)
+                .param(DashboardConstants.Overview.FINANCIAL_PORTFOLIO_ID, FINANCIAL_PORTFOLIO_ID))
+        .andExpect(status().isOk());
 
-		getMvc().perform(get("/api/overview/recentTransactions").contentType(MediaType.APPLICATION_JSON)
-				.param(DashboardConstants.Overview.DATE_MEANT_FOR, DATE_MEANT_FOR)
-				.param(DashboardConstants.Overview.FINANCIAL_PORTFOLIO_ID, FINANCIAL_PORTFOLIO_ID))
-				.andExpect(status().isOk());
+    verify(getUserTransactionRepository(), times(1))
+        .findByFinancialPortfolioIdAndDate(Mockito.anyString(), Mockito.any());
+  }
 
-		verify(getUserTransactionRepository(), times(1)).findByFinancialPortfolioIdAndDate(Mockito.anyString(),
-				Mockito.any());
+  /**
+   * TEST: Get lifetime income by financial Portfolio id
+   *
+   * @throws Exception
+   */
+  @WithMockUser(value = "spring")
+  @Test
+  public void getLifetimeIncomeByFinancialPortfolioId() throws Exception {
 
-	}
+    getMvc()
+        .perform(
+            get("/api/overview/lifetime")
+                .contentType(MediaType.APPLICATION_JSON)
+                .param(DashboardConstants.Overview.TYPE_PARAM, TransactionType.INCOME.toString())
+                .param(DashboardConstants.Overview.AVERAGE_PARAM, "true")
+                .param(DashboardConstants.Overview.FINANCIAL_PORTFOLIO_ID, FINANCIAL_PORTFOLIO_ID))
+        .andExpect(status().isOk());
 
-	/**
-	 * TEST: Get lifetime income by financial Portfolio id
-	 * 
-	 * @throws Exception
-	 */
-	@WithMockUser(value = "spring")
-	@Test
-	public void getLifetimeIncomeByFinancialPortfolioId() throws Exception {
+    verify(getUserTransactionRepository(), times(1))
+        .findByFinancialPortfolioIdAndCategories(Mockito.anyString(), Mockito.any());
 
-		getMvc().perform(get("/api/overview/lifetime").contentType(MediaType.APPLICATION_JSON)
-				.param(DashboardConstants.Overview.TYPE_PARAM, TransactionType.INCOME.toString())
-				.param(DashboardConstants.Overview.AVERAGE_PARAM, "true")
-				.param(DashboardConstants.Overview.FINANCIAL_PORTFOLIO_ID, FINANCIAL_PORTFOLIO_ID))
-				.andExpect(status().isOk());
+    when(getBankAccountRepository().findByFinancialPortfolioId(FINANCIAL_PORTFOLIO_ID))
+        .thenReturn(getAllBankAccounts());
 
-		verify(getUserTransactionRepository(), times(1)).findByFinancialPortfolioIdAndCategories(Mockito.anyString(),
-				Mockito.any());
+    getMvc()
+        .perform(
+            get("/api/overview/lifetime")
+                .contentType(MediaType.APPLICATION_JSON)
+                .param(
+                    DashboardConstants.Overview.ACCOUNT_CATEGORIES_PARAM,
+                    AccountCategories.ALL.toString())
+                .param(DashboardConstants.Overview.AVERAGE_PARAM, "true")
+                .param(DashboardConstants.Overview.FINANCIAL_PORTFOLIO_ID, FINANCIAL_PORTFOLIO_ID))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$").isNotEmpty());
+  }
 
-		when(getBankAccountRepository().findByFinancialPortfolioId(FINANCIAL_PORTFOLIO_ID))
-				.thenReturn(getAllBankAccounts());
+  private MockMvc getMvc() {
+    return mvc;
+  }
 
-		getMvc().perform(get("/api/overview/lifetime").contentType(MediaType.APPLICATION_JSON)
-				.param(DashboardConstants.Overview.ACCOUNT_CATEGORIES_PARAM, AccountCategories.ALL.toString())
-				.param(DashboardConstants.Overview.AVERAGE_PARAM, "true")
-				.param(DashboardConstants.Overview.FINANCIAL_PORTFOLIO_ID, FINANCIAL_PORTFOLIO_ID))
-				.andExpect(status().isOk()).andExpect(jsonPath("$").isNotEmpty());
-	}
+  private void setMvc(MockMvc mvc) {
+    this.mvc = mvc;
+  }
 
-	private MockMvc getMvc() {
-		return mvc;
-	}
+  private UserTransactionsRepository getUserTransactionRepository() {
+    return userTransactionRepository;
+  }
 
-	private void setMvc(MockMvc mvc) {
-		this.mvc = mvc;
-	}
+  private BankAccountRepository getBankAccountRepository() {
+    return bankAccountRepository;
+  }
 
-	private UserTransactionsRepository getUserTransactionRepository() {
-		return userTransactionRepository;
-	}
+  private List<BankAccount> getAllBankAccounts() {
+    return allBankAccounts;
+  }
 
-	private BankAccountRepository getBankAccountRepository() {
-		return bankAccountRepository;
-	}
-
-	private List<BankAccount> getAllBankAccounts() {
-		return allBankAccounts;
-	}
-
-	private void setAllBankAccounts(List<BankAccount> allBankAccounts) {
-		this.allBankAccounts = allBankAccounts;
-	}
-
+  private void setAllBankAccounts(List<BankAccount> allBankAccounts) {
+    this.allBankAccounts = allBankAccounts;
+  }
 }
